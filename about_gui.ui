@@ -18,7 +18,7 @@
     <rect>
      <x>9</x>
      <y>9</y>
-     <width>271</width>
+     <width>481</width>
      <height>33</height>
     </rect>
    </property>
@@ -28,7 +28,7 @@
     </font>
    </property>
    <property name="text">
-    <string>afk-arena-tools V1.0.0</string>
+    <string>afk-arena-tools V1.0.1</string>
    </property>
    <property name="alignment">
     <set>Qt::AlignCenter</set>

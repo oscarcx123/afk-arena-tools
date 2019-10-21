@@ -11,7 +11,7 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>afk-arena-tools V1.0.0</string>
+   <string>afk-arena-tools V1.0.1</string>
   </property>
   <widget class="QWidget" name="centralwidget">
    <widget class="QTabWidget" name="tabWidget">
@@ -321,20 +321,20 @@
        <property name="geometry">
         <rect>
          <x>10</x>
-         <y>40</y>
+         <y>90</y>
          <width>221</width>
          <height>40</height>
         </rect>
        </property>
        <property name="text">
-        <string>连接手机</string>
+        <string>WIFI连接手机</string>
        </property>
       </widget>
       <widget class="QPushButton" name="pushButton_22">
        <property name="geometry">
         <rect>
          <x>10</x>
-         <y>90</y>
+         <y>190</y>
          <width>221</width>
          <height>40</height>
         </rect>
@@ -353,20 +353,30 @@
         </rect>
        </property>
        <property name="text">
-        <string>PushButton</string>
+        <string>USB连接手机</string>
        </property>
       </widget>
-      <widget class="QPushButton" name="pushButton_24">
+      <widget class="QLineEdit" name="lineEdit">
        <property name="geometry">
         <rect>
          <x>10</x>
-         <y>190</y>
-         <width>221</width>
+         <y>40</y>
+         <width>171</width>
+         <height>34</height>
+        </rect>
+       </property>
+      </widget>
+      <widget class="QPushButton" name="pushButton_29">
+       <property name="geometry">
+        <rect>
+         <x>180</x>
+         <y>40</y>
+         <width>51</width>
          <height>40</height>
         </rect>
        </property>
        <property name="text">
-        <string>PushButton</string>
+        <string>保存</string>
        </property>
       </widget>
      </widget>

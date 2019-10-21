@@ -45,6 +45,8 @@ class MainWin(QMainWindow):
         self.curr_func = None
         # log框只读
         self.ui.textBrowser.setReadOnly(True)
+        # 默认wifi_adb地址
+        self.ui.lineEdit.setText(self.afk.utils.wifi_adb_addr)
 
 
     # 信号和槽（绑定事件）初始化
@@ -59,6 +61,8 @@ class MainWin(QMainWindow):
         self.ui.pushButton_20.clicked.connect(self.stop_thread)
         self.ui.pushButton_21.clicked.connect(self.afk.utils.adb_connect)
         self.ui.pushButton_22.clicked.connect(self.afk.utils.get_img)
+        self.ui.pushButton_23.clicked.connect(self.afk.utils.adb_connect_usb)
+        self.ui.pushButton_29.clicked.connect(self.get_new_wifi_adb_addr)
         self.ui.checkBox.clicked.connect(self.check_ratio)
         self.afk.utils.logger.update_signal.connect(self.write_log)
         self.afk.utils.logger.error_stop_signal.connect(self.stop_thread)
@@ -110,6 +114,10 @@ class MainWin(QMainWindow):
         else:
             self.afk.utils.ratio = 1
             self.write_log("成功将比例调整为1")
+
+    def get_new_wifi_adb_addr(self):
+        self.afk.utils.wifi_adb_addr = self.ui.lineEdit.text()
+        self.write_log("保存wifi_adb地址成功！")
 
 '''
 【子窗口基类】

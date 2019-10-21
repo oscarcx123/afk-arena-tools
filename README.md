@@ -19,15 +19,23 @@
 电脑需要安装：
 
 * Python3.6或以上版本
-* OpenCV
+* OpenCV（从pip安装即可）
 * adb（Android Debug Bridge）
 * PyQt5（从pip安装即可）
 
+输入下面指令即可安装，Linux用户记得加sudo
+
+```
+pip install opencv-python PyQt5
+```
+
 因为使用到ADB，只能作用于安卓手机。
 
-目前Manjaro Linux上测试通过，Windows上仍需要一些适配。
+目前以下操作系统测试通过：
+* Manjaro Linux
+* Windows 10 (ver 1903)
 
-运行main.py即可～
+双击启动脚本或者运行main.py
 
 ## 操作说明
 
@@ -35,11 +43,15 @@
 
 ## 开发计划
 
-*  适配Windows系统
 *  一键完成每日必做的任务
 *  一键打迷宫（感觉本菜鸡水平不足，不一定能做到）
 
 ## 更新说明
+
+### 2019.10.20 V1.0.1
+
+* [x] 适配Windows系统
+* [x] adb连接使用子线程防止阻塞
 
 ### 2019.10.18 V1.0.0
 

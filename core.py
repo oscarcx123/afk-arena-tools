@@ -3,8 +3,8 @@ import os
 import numpy as np
 import time
 import random
-
-import global_var
+import platform
+from threading import Thread
 
 from PyQt5.QtCore import QObject, pyqtSignal
 
@@ -45,6 +45,10 @@ class Utils():
         self.logger = UpdateLog()
         # 停止操作回调
         self.stop_callback = False
+        # 系统平台
+        self.system = platform.system()
+        # wifi_adb默认地址
+        self.wifi_adb_addr = "192.168.1.239:5555"
 
     # 加载图像资源
     def load_res(self):
@@ -61,7 +65,7 @@ class Utils():
 
     # 获取截图
     def get_img(self):
-        cmd = "adb shell screencap -p > screenshot.png"
+        cmd = "adb exec-out screencap -p > screenshot.png"
         self.exec_cmd(cmd)
         if self.is_file_empty("screenshot.png"):
             self.write_log(f"截图失败！原因：生成的screenshot.png为空文件，请检查adb是否已经跟手机连接！")
@@ -79,12 +83,12 @@ class Utils():
         # 匹配
         try:
             result = cv2.matchTemplate(self.target_img, find_img, cv2.TM_CCOEFF_NORMED)
-            min_val,max_val,min_loc,max_loc = cv2.minMaxLoc(result)
+            min_val,self.max_val,min_loc,max_loc = cv2.minMaxLoc(result)
         except:
             self.write_log(f"OpenCV对比失败！请检查screenshot.png是否存在，并且不是空文件！")
             self.error_stop()
-        print(f"{img_name}最大匹配度：{max_val}")
-        if max_val < 0.93:
+        print(f"{img_name}最大匹配度：{self.max_val}")
+        if self.max_val < 0.93:
             return False
         
         # 计算位置
@@ -102,16 +106,31 @@ class Utils():
         self.exec_cmd(cmd)
 
     # 执行指令
-    def exec_cmd(self, cmd):
+    def exec_cmd(self, cmd, new_thread=False):
+        if self.system == "Windows":
+            cmd = cmd.replace("adb", "adb.exe")
+        if new_thread:
+            t = Thread(target=self.thread_exec_cmd, args=[cmd])
+            t.start()
+        else:
+            os.system(cmd)
+
+    # 子线程执行指令（防止阻塞）
+    def thread_exec_cmd(self, cmd):
         os.system(cmd)
+        self.write_log(f"{cmd}执行完毕")
 
     # 控制台显示执行次数
     def show_cnt(self):
         self.write_log(f"已重试{self.cnt}次！")
 
-    # adb连接
+    # adb连接（WIFI）
     def adb_connect(self):
-        self.exec_cmd("adb connect 192.168.1.239:5555")
+        self.exec_cmd(f"adb connect {self.wifi_adb_addr}", new_thread=True)
+
+    # adb连接（USB）
+    def adb_connect_usb(self):
+        self.exec_cmd("adb devices")
 
     # 画点（测试用）
     def draw_circle(self):
@@ -145,7 +164,6 @@ class Utils():
             if self.stop_callback:
                 self.stop_callback = False
                 break
-
 
 
 # 预设的一些指令组
@@ -221,9 +239,21 @@ class Command():
         time.sleep(2)
         
         # 开始挑战
-        x_coord = random.randint(360-50, 360+50)
-        y_coord = random.randint(1240-10, 1240+10)
-        self.utils.tap(x_coord, y_coord)
+        cnt = 1
+        max_trial = 3
+        while cnt <= max_trial:
+            self.utils.get_img()
+            if self.utils.match("battle_button.png"):
+                x_coord, y_coord = self.utils.get_coord()
+                self.utils.tap(x_coord, y_coord)
+                break
+            else:
+                self.utils.write_log(f"第{cnt}/{max_trial}次匹配”战斗“按钮失败！匹配度{self.utils.max_val}。")
+                cnt += 1
+                if cnt > max_trial:
+                    self.utils.write_log(f"{max_trial}次匹配全部失败！自动停止当前正在执行的功能！")
+                    self.utils.error_stop()
+
 
     # 战斗失败时重试
     def retry_on_lose(self):
