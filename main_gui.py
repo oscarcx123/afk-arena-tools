@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'main_gui.ui'
 #
-# Created by: PyQt5 UI code generator 5.13.1
+# Created by: PyQt5 UI code generator 5.13.0
 #
 # WARNING! All changes made in this file will be lost!
 
@@ -138,7 +138,7 @@ class Ui_MainWindow(object):
         self.tabWidget.addTab(self.tab_2, "")
         MainWindow.setCentralWidget(self.centralwidget)
         self.menubar = QtWidgets.QMenuBar(MainWindow)
-        self.menubar.setGeometry(QtCore.QRect(0, 0, 801, 36))
+        self.menubar.setGeometry(QtCore.QRect(0, 0, 801, 26))
         self.menubar.setObjectName("menubar")
         self.menu = QtWidgets.QMenu(self.menubar)
         self.menu.setObjectName("menu")
@@ -160,7 +160,7 @@ class Ui_MainWindow(object):
 
     def retranslateUi(self, MainWindow):
         _translate = QtCore.QCoreApplication.translate
-        MainWindow.setWindowTitle(_translate("MainWindow", "afk-arena-tools V1.0.1"))
+        MainWindow.setWindowTitle(_translate("MainWindow", "afk-arena-tools V1.0.2"))
         self.groupBox.setTitle(_translate("MainWindow", "故事模式"))
         self.pushButton.setText(_translate("MainWindow", "自动重试"))
         self.pushButton_2.setText(_translate("MainWindow", "自动推图"))

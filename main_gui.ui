@@ -11,7 +11,7 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>afk-arena-tools V1.0.1</string>
+   <string>afk-arena-tools V1.0.2</string>
   </property>
   <widget class="QWidget" name="centralwidget">
    <widget class="QTabWidget" name="tabWidget">
@@ -519,7 +519,7 @@
      <x>0</x>
      <y>0</y>
      <width>801</width>
-     <height>36</height>
+     <height>26</height>
     </rect>
    </property>
    <widget class="QMenu" name="menu">

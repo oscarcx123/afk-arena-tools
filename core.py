@@ -34,7 +34,7 @@ class Utils():
         # 计数
         self.cnt = 0
         # 一般无需调整比例（默认为1），但是手机魔改之后如果点不到，可以尝试修改这个
-        # 例如我的手机分辨率从1080p降低到了720p，需要调整比例
+        # 例如我的旧手机分辨率从1080p降低到了720p，需要调整比例
         self.ratio = 1
         # log临时堆栈，输出后会pop掉
         self.text = []
@@ -175,7 +175,8 @@ class Command():
             "retry_on_lose": "self.exec_status = self.utils.match('retry_button.png')",
             "proceed_on_win": "self.exec_status = self.utils.match('next_stage_button.png')",
             "tower_on_win": "self.exec_status = self.utils.match('tower_continue_button.png')",
-            "challenge_tower": "self.exec_status = self.utils.match('tower_challenge_button.png')"
+            "challenge_tower": "self.exec_status = self.utils.match('tower_challenge_button.png')",
+            "tower_enter_level": "self.exec_status = self.utils.match('tower_enter_level_button.png')"
         }
         # 是否执行指令
         self.exec_status = None
@@ -202,7 +203,8 @@ class Command():
     # 故事模式（只重试，过关之后不挑战下一关）
     def story_mode_retry_only(self):
         cmd_list = [
-            "retry_on_lose"
+            "retry_on_lose",
+            "challenge_tower"
         ]
         self.exec_func(cmd_list)
 
@@ -210,7 +212,8 @@ class Command():
     def story_mode(self):
         cmd_list = [
             "retry_on_lose",
-            "proceed_on_win"
+            "proceed_on_win",
+            "challenge_tower"
         ]
         self.exec_func(cmd_list)
 
@@ -218,6 +221,8 @@ class Command():
     def tower_mode_retry_only(self):
         cmd_list = [
             "retry_on_lose",
+            "tower_enter_level",
+            "challenge_tower"
         ]
         self.exec_func(cmd_list)
 
@@ -226,7 +231,8 @@ class Command():
         cmd_list = [
             "retry_on_lose",
             "tower_on_win",
-            "challenge_tower"
+            "challenge_tower",
+            "tower_enter_level"
         ]
         self.exec_func(cmd_list)
         
@@ -242,6 +248,8 @@ class Command():
         cnt = 1
         max_trial = 3
         while cnt <= max_trial:
+            if self.stop:
+                break
             self.utils.get_img()
             if self.utils.match("battle_button.png"):
                 x_coord, y_coord = self.utils.get_coord()
@@ -279,5 +287,9 @@ class Command():
 
     # 挑战王座之塔
     def challenge_tower(self):
-        self.click_retry_and_start()
+        x_coord, y_coord = self.utils.get_coord()
+        self.utils.tap(x_coord, y_coord)
 
+    def tower_enter_level(self):
+        x_coord, y_coord = self.utils.get_coord()
+        self.utils.tap(x_coord, y_coord)
