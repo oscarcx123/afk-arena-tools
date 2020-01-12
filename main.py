@@ -47,6 +47,7 @@ class MainWin(QMainWindow):
         self.ui.textBrowser.setReadOnly(True)
         # 默认wifi_adb地址
         self.ui.lineEdit.setText(self.afk.utils.wifi_adb_addr)
+        self.ui.radioButton.setChecked(True)
 
 
     # 信号和槽（绑定事件）初始化
@@ -64,6 +65,9 @@ class MainWin(QMainWindow):
         self.ui.pushButton_23.clicked.connect(self.afk.utils.adb_connect_usb)
         self.ui.pushButton_29.clicked.connect(self.get_new_wifi_adb_addr)
         self.ui.checkBox.clicked.connect(self.check_ratio)
+        self.ui.radioButton.clicked.connect(partial(self.change_resolution, 100))
+        self.ui.radioButton_2.clicked.connect(partial(self.change_resolution, 75))
+        self.ui.radioButton_3.clicked.connect(partial(self.change_resolution, 50))
         self.afk.utils.logger.update_signal.connect(self.write_log)
         self.afk.utils.logger.error_stop_signal.connect(self.stop_thread)
         
@@ -106,7 +110,8 @@ class MainWin(QMainWindow):
             self.ui.textBrowser.insertPlainText(f"[{curr_time}]{text}\n")
             self.ui.textBrowser.ensureCursorVisible()
 
-
+    # 更改截图与实际坐的比例
+    # 例如：手机截图是1080P但是点击坐标系是720P，就勾选这个
     def check_ratio(self):
         if self.ui.checkBox.isChecked():
             self.afk.utils.ratio = 720 / 1080
@@ -115,6 +120,12 @@ class MainWin(QMainWindow):
             self.afk.utils.ratio = 1
             self.write_log("成功将比例调整为1")
 
+    # 更改分辨率
+    def change_resolution(self, percentage):
+        self.afk.utils.load_res(percentage)
+        self.write_log(f"成功将分辨率更改为{int(1440 * percentage / 100)}P")
+
+    # 写入新的wifi_adb地址
     def get_new_wifi_adb_addr(self):
         self.afk.utils.wifi_adb_addr = self.ui.lineEdit.text()
         self.write_log("保存wifi_adb地址成功！")

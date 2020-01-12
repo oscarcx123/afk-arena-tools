@@ -11,7 +11,7 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>afk-arena-tools V1.0.2</string>
+   <string>afk-arena-tools V1.0.3</string>
   </property>
   <widget class="QWidget" name="centralwidget">
    <widget class="QTabWidget" name="tabWidget">
@@ -455,58 +455,58 @@
        </rect>
       </property>
       <property name="title">
-       <string>其它</string>
+       <string>分辨率设置</string>
       </property>
-      <widget class="QPushButton" name="pushButton_30">
-       <property name="geometry">
-        <rect>
-         <x>10</x>
-         <y>90</y>
-         <width>221</width>
-         <height>40</height>
-        </rect>
-       </property>
-       <property name="text">
-        <string>PushButton</string>
-       </property>
-      </widget>
-      <widget class="QPushButton" name="pushButton_31">
-       <property name="geometry">
-        <rect>
-         <x>10</x>
-         <y>140</y>
-         <width>221</width>
-         <height>40</height>
-        </rect>
-       </property>
-       <property name="text">
-        <string>PushButton</string>
-       </property>
-      </widget>
-      <widget class="QPushButton" name="pushButton_32">
-       <property name="geometry">
-        <rect>
-         <x>10</x>
-         <y>190</y>
-         <width>221</width>
-         <height>40</height>
-        </rect>
-       </property>
-       <property name="text">
-        <string>PushButton</string>
-       </property>
-      </widget>
       <widget class="QCheckBox" name="checkBox">
        <property name="geometry">
         <rect>
          <x>10</x>
-         <y>40</y>
+         <y>190</y>
          <width>221</width>
          <height>34</height>
         </rect>
        </property>
        <property name="text">
         <string>使用720/1080的比例</string>
+       </property>
+      </widget>
+      <widget class="QRadioButton" name="radioButton">
+       <property name="geometry">
+        <rect>
+         <x>10</x>
+         <y>40</y>
+         <width>221</width>
+         <height>41</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>1440P / 2K (1440x2560)</string>
+       </property>
+      </widget>
+      <widget class="QRadioButton" name="radioButton_2">
+       <property name="geometry">
+        <rect>
+         <x>10</x>
+         <y>90</y>
+         <width>221</width>
+         <height>41</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>1080P (1080x1920)</string>
+       </property>
+      </widget>
+      <widget class="QRadioButton" name="radioButton_3">
+       <property name="geometry">
+        <rect>
+         <x>10</x>
+         <y>140</y>
+         <width>221</width>
+         <height>41</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>720P (720x1280)</string>
        </property>
       </widget>
      </widget>

@@ -51,7 +51,7 @@ class Utils():
         self.wifi_adb_addr = "192.168.1.239:5555"
 
     # 加载图像资源
-    def load_res(self):
+    def load_res(self, scale_percentage=100):
         # 匹配对象的字典
         self.res = {}
         file_dir = os.path.join(os.getcwd(), "img")
@@ -60,7 +60,13 @@ class Utils():
             self.res[item] = {}
             res_path = os.path.join(file_dir, item)
             self.res[item]["img"] = cv2.imread(res_path)
-            self.res[item]["height"], self.res[item]["width"], self.res[item]["channel"] = self.res[item]["img"].shape[::]
+            # 如果不是原尺寸（1440P），进行对应缩放操作
+            if scale_percentage != 100:
+                self.res[item]["width"] = int(self.res[item]["img"].shape[1] * scale_percentage / 100) 
+                self.res[item]["height"] = int(self.res[item]["img"].shape[0] * scale_percentage / 100)
+                self.res[item]["img"] = cv2.resize(self.res[item]["img"], (self.res[item]["width"], self.res[item]["height"]), interpolation=cv2.INTER_AREA)
+            else:
+                self.res[item]["height"], self.res[item]["width"], self.res[item]["channel"] = self.res[item]["img"].shape[::]
 
 
     # 获取截图
@@ -100,7 +106,9 @@ class Utils():
         return True
 
     # 点击
-    def tap(self, x_coord, y_coord):
+    def tap(self, x_coord=None, y_coord=None):
+        if x_coord is None and y_coord is None:
+            x_coord, y_coord = self.get_coord()
         self.write_log(f"点击坐标：{(x_coord, y_coord)}")
         cmd = f"adb shell input tap {x_coord} {y_coord}"
         self.exec_cmd(cmd)
@@ -172,11 +180,11 @@ class Command():
         self.utils = Utils()
         # 指令与执行操作的对应关系
         self.func = {
-            "retry_on_lose": "self.exec_status = self.utils.match('retry_button.png')",
-            "proceed_on_win": "self.exec_status = self.utils.match('next_stage_button.png')",
-            "tower_on_win": "self.exec_status = self.utils.match('tower_continue_button.png')",
-            "challenge_tower": "self.exec_status = self.utils.match('tower_challenge_button.png')",
-            "tower_enter_level": "self.exec_status = self.utils.match('tower_enter_level_button.png')"
+            "click_retry": "self.exec_status = self.utils.match('retry_button.png')",
+            "click_next_stage": "self.exec_status = self.utils.match('next_stage_button.png')",
+            "click_continue": "self.exec_status = self.utils.match('continue_button.png')",
+            "click_battle": "self.exec_status = self.utils.match('battle_button.png')",
+            "click_challenge": "self.exec_status = self.utils.match('challenge_button.png')"
         }
         # 是否执行指令
         self.exec_status = None
@@ -203,93 +211,68 @@ class Command():
     # 故事模式（只重试，过关之后不挑战下一关）
     def story_mode_retry_only(self):
         cmd_list = [
-            "retry_on_lose",
-            "challenge_tower"
+            "click_retry",
+            "click_battle"
         ]
         self.exec_func(cmd_list)
 
     # 故事模式（推图）
     def story_mode(self):
         cmd_list = [
-            "retry_on_lose",
-            "proceed_on_win",
-            "challenge_tower"
+            "click_retry",
+            "click_next_stage",
+            "click_battle"
         ]
         self.exec_func(cmd_list)
 
     # 王座之塔模式（只重试，过关之后不挑战下一关）
     def tower_mode_retry_only(self):
         cmd_list = [
-            "retry_on_lose",
-            "tower_enter_level",
-            "challenge_tower"
+            "click_retry",
+            "click_challenge",
+            "click_battle"
         ]
         self.exec_func(cmd_list)
 
     # 王座之塔模式（推塔）
     def tower_mode(self):
         cmd_list = [
-            "retry_on_lose",
-            "tower_on_win",
-            "challenge_tower",
-            "tower_enter_level"
+            "click_retry",
+            "click_continue",
+            "click_battle",
+            "click_challenge"
         ]
         self.exec_func(cmd_list)
         
-    # 点击“再次挑战”并开始挑战
-    def click_retry_and_start(self):
-        # 点击“再次挑战”
-        x_coord, y_coord = self.utils.get_coord()
-        self.utils.tap(x_coord, y_coord)
-        
-        time.sleep(2)
-        
-        # 开始挑战
-        cnt = 1
-        max_trial = 3
-        while cnt <= max_trial:
-            if self.stop:
-                break
-            self.utils.get_img()
-            if self.utils.match("battle_button.png"):
-                x_coord, y_coord = self.utils.get_coord()
-                self.utils.tap(x_coord, y_coord)
-                break
-            else:
-                self.utils.write_log(f"第{cnt}/{max_trial}次匹配”战斗“按钮失败！匹配度{self.utils.max_val}。")
-                cnt += 1
-                if cnt > max_trial:
-                    self.utils.write_log(f"{max_trial}次匹配全部失败！自动停止当前正在执行的功能！")
-                    self.utils.error_stop()
-
-
-    # 战斗失败时重试
-    def retry_on_lose(self):
+    
+    # 点击“再次挑战”
+    def click_retry(self):
         self.utils.cnt += 1
         self.utils.show_cnt()
-        self.click_retry_and_start()
+        self.utils.tap()
         
 
-    # 战斗成功时直接挑战下一关
-    def proceed_on_win(self):
+    # 点击“下一关”
+    def click_next_stage(self):
         # 挑战成功，重置”重试计数“
         self.utils.cnt = 0
         self.utils.write_log("【故事模式】恭喜过关！即将自动开始挑战下一关！")
-        self.click_retry_and_start()
+        self.utils.tap()
 
-    # 王座之塔战斗胜利时点击屏幕继续
-    def tower_on_win(self):
-        # 挑战成功，重置”重试计数“
+
+    # 点击“点击屏幕继续”（用于王座之塔页面）
+    def click_continue(self):
+        # 挑战成功，重置“重试计数”
         self.utils.cnt = 0
         self.utils.write_log("【王座之塔】恭喜过关！即将自动开始挑战下一关！")
-        x_coord, y_coord = self.utils.get_coord()
-        self.utils.tap(x_coord, y_coord)
+        self.utils.tap()
 
-    # 挑战王座之塔
-    def challenge_tower(self):
-        x_coord, y_coord = self.utils.get_coord()
-        self.utils.tap(x_coord, y_coord)
 
-    def tower_enter_level(self):
-        x_coord, y_coord = self.utils.get_coord()
-        self.utils.tap(x_coord, y_coord)
+    # 点击“战斗”
+    def click_battle(self):
+        self.utils.tap()
+
+
+    # 点击“挑战”（用于王座之塔页面）
+    def click_challenge(self):
+        self.utils.tap()
