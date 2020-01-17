@@ -4,7 +4,7 @@
 
 使用 Python + OpenCV + PyQt5 + adb 制作的AFK Arena / 剑与远征 辅助。
 
-原理是OpenCV识别图片，adb负责截图和点击操作，仅此而已。
+原理是OpenCV识别图片，adb负责截图和点击操作。
 
 <p align="center">
   <img src="./_docs/img/main_gui.png" alt="main_gui" width="500"/>
@@ -20,7 +20,7 @@
 
 * Python3.6或以上版本
 * OpenCV（从pip安装即可）
-* adb（Android Debug Bridge）
+* adb（Windows版本的release包自带）
 * PyQt5（从pip安装即可）
 
 输入下面指令即可安装，Linux用户记得加sudo
@@ -29,21 +29,23 @@
 pip install opencv-python PyQt5
 ```
 
-因为使用到ADB，只能作用于安卓手机。
+因为使用到ADB，只能作用于安卓手机。大部分安卓模拟器也是可以的，点“USB连接手机”应该就行。
 
 目前以下操作系统测试通过：
 * Manjaro Linux
 * Windows 10 (ver 1903)
 
-双击启动脚本或者运行main.py
+双击启动脚本（懒人专用）或者运行main.py
 
 ## 操作说明
 
 在“杂项”菜单中选择适合的方式连接adb，连接成功后点击对应功能即可。如果连不上，检查下开发者模式中的USB debug是否开启。WIFI adb可以使用这个repo内thirdparty文件夹下的app（不包含在release包里，不是我开发的，是否使用请自行决定），需要root。
 
-分辨率在“杂项”菜单选择，默认分辨率为1440p
+分辨率在“杂项”菜单选择，默认分辨率为1440p，如果你的设备不是这个分辨率，务必更改为其它选项，否则会出现能匹配但是点不到的问题。
 
-自动推图功能需要进入到选择队伍页面（正下方有“战斗”字样）才能使用
+推图的自动重试功能需要进入选择队伍页面（正下方有“战斗”字样）才能使用
+
+自动推图功能只需进入到关卡详情页面（标有关卡代号并且展示敌方阵容的一个框）就可以使用了
 
 王座之塔功能需要进入具体的塔才能使用
 
@@ -60,7 +62,7 @@ pip install opencv-python PyQt5
 
 * [ ] 一键完成每日必做的任务
 
-### 2020.01.12 V1.0.4
+### 2020.01.17 V1.0.4
 
 * [x] 修复推图到boss关就停下的问题（issue #3）
 
