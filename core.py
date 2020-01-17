@@ -184,7 +184,8 @@ class Command():
             "click_next_stage": "self.exec_status = self.utils.match('next_stage_button.png')",
             "click_continue": "self.exec_status = self.utils.match('continue_button.png')",
             "click_battle": "self.exec_status = self.utils.match('battle_button.png')",
-            "click_challenge": "self.exec_status = self.utils.match('challenge_button.png')"
+            "click_challenge": "self.exec_status = self.utils.match('challenge_button.png')",
+            "check_boss_stage": "self.exec_status = self.utils.match('challenge_boss_button.png')"
         }
         # 是否执行指令
         self.exec_status = None
@@ -221,7 +222,8 @@ class Command():
         cmd_list = [
             "click_retry",
             "click_next_stage",
-            "click_battle"
+            "click_battle",
+            "check_boss_stage"
         ]
         self.exec_func(cmd_list)
 
@@ -275,4 +277,9 @@ class Command():
 
     # 点击“挑战”（用于王座之塔页面）
     def click_challenge(self):
+        self.utils.tap()
+
+    # 检测是否为推图boss关卡
+    # 推图到boss关卡时，点击“下一关”无效，会退回到关卡详情页面，需要点击“挑战首领”一次才能进入搭配阵容界面
+    def check_boss_stage(self):
         self.utils.tap()

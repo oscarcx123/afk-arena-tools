@@ -160,7 +160,7 @@ class Ui_MainWindow(object):
 
     def retranslateUi(self, MainWindow):
         _translate = QtCore.QCoreApplication.translate
-        MainWindow.setWindowTitle(_translate("MainWindow", "afk-arena-tools V1.0.3"))
+        MainWindow.setWindowTitle(_translate("MainWindow", "afk-arena-tools V1.0.4"))
         self.groupBox.setTitle(_translate("MainWindow", "故事模式"))
         self.pushButton.setText(_translate("MainWindow", "自动重试"))
         self.pushButton_2.setText(_translate("MainWindow", "自动推图"))
