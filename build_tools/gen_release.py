@@ -1,7 +1,7 @@
 import os
 import zipfile
 
-version = "1.0.4"
+version = "1.0.5"
 
 core_file_list = [
     'about_gui.py',
@@ -27,16 +27,23 @@ linux_file_list = [
 
 version_str = "V" + version
 
+img_dir = os.path.join(os.getcwd(), "img")
+
 file_list = os.listdir()
+img_list = os.listdir(img_dir)
 
 with zipfile.ZipFile("afk-arena-tools_" + version_str + "_windows.zip", "w") as zfile:
-    for f in core_file_list:   
+    for f in core_file_list:
         zfile.write(f)
+    for f in img_list:
+        zfile.write(os.path.join("img", f))
     for f in windows_file_list:   
         zfile.write(f)
 
 with zipfile.ZipFile("afk-arena-tools_" + version_str + "_linux.zip", "w") as zfile:
     for f in core_file_list:   
         zfile.write(f)
+    for f in img_list:
+        zfile.write(os.path.join("img", f))
     for f in linux_file_list:   
         zfile.write(f)

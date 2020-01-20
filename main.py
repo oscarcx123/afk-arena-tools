@@ -122,7 +122,8 @@ class MainWin(QMainWindow):
 
     # 更改分辨率
     def change_resolution(self, percentage):
-        self.afk.utils.load_res(percentage)
+        self.afk.utils.scale_percentage = percentage
+        self.afk.utils.load_res()
         self.write_log(f"成功将分辨率更改为{int(1440 * percentage / 100)}P")
 
     # 写入新的wifi_adb地址

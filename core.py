@@ -36,6 +36,10 @@ class Utils():
         # 一般无需调整比例（默认为1），但是手机魔改之后如果点不到，可以尝试修改这个
         # 例如我的旧手机分辨率从1080p降低到了720p，需要调整比例
         self.ratio = 1
+        # 分辨率相关
+        self.screen_height = 2560
+        self.screen_width = 1440
+        self.scale_percentage = 100
         # log临时堆栈，输出后会pop掉
         self.text = []
         
@@ -51,7 +55,7 @@ class Utils():
         self.wifi_adb_addr = "192.168.1.239:5555"
 
     # 加载图像资源
-    def load_res(self, scale_percentage=100):
+    def load_res(self):
         # 匹配对象的字典
         self.res = {}
         file_dir = os.path.join(os.getcwd(), "img")
@@ -61,9 +65,9 @@ class Utils():
             res_path = os.path.join(file_dir, item)
             self.res[item]["img"] = cv2.imread(res_path)
             # 如果不是原尺寸（1440P），进行对应缩放操作
-            if scale_percentage != 100:
-                self.res[item]["width"] = int(self.res[item]["img"].shape[1] * scale_percentage / 100) 
-                self.res[item]["height"] = int(self.res[item]["img"].shape[0] * scale_percentage / 100)
+            if self.scale_percentage != 100:
+                self.res[item]["width"] = int(self.res[item]["img"].shape[1] * self.scale_percentage / 100) 
+                self.res[item]["height"] = int(self.res[item]["img"].shape[0] * self.scale_percentage / 100)
                 self.res[item]["img"] = cv2.resize(self.res[item]["img"], (self.res[item]["width"], self.res[item]["height"]), interpolation=cv2.INTER_AREA)
             else:
                 self.res[item]["height"], self.res[item]["width"], self.res[item]["channel"] = self.res[item]["img"].shape[::]
@@ -105,10 +109,16 @@ class Utils():
             self.draw_circle()
         return True
 
-    # 点击
-    def tap(self, x_coord=None, y_coord=None):
+    # 点击（传入坐标）
+    # 也可以接受比例形式坐标，例如(0.5, 0.5, percentage=True)就是点屏幕中心
+    def tap(self, x_coord=None, y_coord=None, percentage=False):
         if x_coord is None and y_coord is None:
             x_coord, y_coord = self.get_coord()
+        if percentage:
+            x_coord = int(x_coord * self.screen_width * (self.scale_percentage / 100) * self.ratio)
+            y_coord = int(y_coord * self.screen_height * (self.scale_percentage / 100) * self.ratio)
+            x_coord = self.randomize_coord(x_coord, 5)
+            y_coord = self.randomize_coord(y_coord, 5)
         self.write_log(f"点击坐标：{(x_coord, y_coord)}")
         cmd = f"adb shell input tap {x_coord} {y_coord}"
         self.exec_cmd(cmd)
@@ -138,7 +148,7 @@ class Utils():
 
     # adb连接（USB）
     def adb_connect_usb(self):
-        self.exec_cmd("adb devices")
+        self.exec_cmd("adb devices", new_thread=True)
 
     # 画点（测试用）
     def draw_circle(self):
@@ -147,13 +157,17 @@ class Utils():
         cv2.circle(self.target_img, self.pointLowRight, 2, (255, 255, 255), -1)
         cv2.imwrite("shot_with_circle.png", self.target_img)
 
-    # 获取坐标并进行随机偏移处理
+    # 获取匹配到的坐标
     def get_coord(self):
         x_coord = int(self.pointCentre[0] * self.ratio)
-        x_coord = random.randint(x_coord - 20, x_coord + 20)
+        x_coord = self.randomize_coord(x_coord, 20)
         y_coord = int(self.pointCentre[1] * self.ratio)
-        y_coord = random.randint(y_coord - 15, y_coord + 15)
+        y_coord = self.randomize_coord(y_coord, 15)
         return x_coord, y_coord
+
+    # 坐标进行随机偏移处理
+    def randomize_coord(self, coord, diff):
+        return random.randint(coord - diff, coord + diff)
 
     # 在GUI的文本框内写入log
     def write_log(self, text):
@@ -185,7 +199,10 @@ class Command():
             "click_continue": "self.exec_status = self.utils.match('continue_button.png')",
             "click_battle": "self.exec_status = self.utils.match('battle_button.png')",
             "click_challenge": "self.exec_status = self.utils.match('challenge_button.png')",
-            "check_boss_stage": "self.exec_status = self.utils.match('challenge_boss_button.png')"
+            "check_boss_stage": "self.exec_status = self.utils.match('challenge_boss_button.png')",
+            "check_bundle_pop_up": "self.exec_status = self.utils.match('bundle_pop_up.png')",
+            "click_challenge_boss_fp": "self.exec_status = self.utils.match('challenge_boss_fp_button.png')",
+            
         }
         # 是否执行指令
         self.exec_status = None
@@ -223,7 +240,9 @@ class Command():
             "click_retry",
             "click_next_stage",
             "click_battle",
-            "check_boss_stage"
+            "check_boss_stage",
+            "click_challenge_boss_fp",
+            "check_bundle_pop_up"
         ]
         self.exec_func(cmd_list)
 
@@ -283,3 +302,14 @@ class Command():
     # 推图到boss关卡时，点击“下一关”无效，会退回到关卡详情页面，需要点击“挑战首领”一次才能进入搭配阵容界面
     def check_boss_stage(self):
         self.utils.tap()
+
+    # 点击主页面（战役tab）的“挑战首领”
+    def click_challenge_boss_fp(self):
+        self.utils.tap()
+
+    # 检测限时礼包弹窗
+    # 如果过关之后弹出限时礼包购买窗口，直接点击屏幕下方关闭
+    def check_bundle_pop_up(self):
+        self.utils.tap(0.5, 0.9, percentage=True)
+        self.utils.write_log("检测到有限时礼包弹窗并自动关闭成功！")
+    
