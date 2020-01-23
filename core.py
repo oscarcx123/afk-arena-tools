@@ -1,9 +1,10 @@
-import cv2
 import os
-import numpy as np
+import cv2
 import time
 import random
 import platform
+import subprocess
+import numpy as np
 from threading import Thread
 
 from PyQt5.QtCore import QObject, pyqtSignal
@@ -29,7 +30,7 @@ class UpdateLog(QObject):
 
 class Utils():
     def __init__(self):
-        # debug开关
+        # debug开关（开启后，成功匹配会弹出图片，上面用圈标明了匹配到的坐标点范围）
         self.debug = False
         # 计数
         self.cnt = 0
@@ -74,14 +75,25 @@ class Utils():
 
 
     # 获取截图
-    def get_img(self):
-        cmd = "adb exec-out screencap -p > screenshot.png"
-        self.exec_cmd(cmd)
-        if self.is_file_empty("screenshot.png"):
-            self.write_log(f"截图失败！原因：生成的screenshot.png为空文件，请检查adb是否已经跟手机连接！")
+    def get_img(self, pop_up_window=False):
+        pipe = subprocess.Popen("adb exec-out screencap -p", stdin=subprocess.PIPE, stdout=subprocess.PIPE, shell=True)
+        image_bytes = pipe.stdout.read()
+
+        if image_bytes == b'':
+            self.write_log(f"截图失败！请检查adb是否已经跟手机连接！")
             self.error_stop()
         else:
-            self.target_img = cv2.imread("screenshot.png")
+            self.target_img = cv2.imdecode(np.fromstring(image_bytes, dtype='uint8'), cv2.IMREAD_COLOR)
+            if pop_up_window:
+                self.show_img()
+
+    def show_img(self):
+        cv2.namedWindow("screenshot", cv2.WINDOW_NORMAL)
+        cv2.resizeWindow('screenshot', 360, 640)
+        cv2.imshow("screenshot", self.target_img)
+        cv2.waitKey(0)
+        cv2.destroyWindow("screenshot")
+
 
     # 匹配并获取中心点
     def match(self, img_name):
@@ -95,7 +107,7 @@ class Utils():
             result = cv2.matchTemplate(self.target_img, find_img, cv2.TM_CCOEFF_NORMED)
             min_val,self.max_val,min_loc,max_loc = cv2.minMaxLoc(result)
         except:
-            self.write_log(f"OpenCV对比失败！请检查screenshot.png是否存在，并且不是空文件！")
+            self.write_log(f"OpenCV对比失败！请使用杂项中的截图功能来测试能否正常截图！")
             self.error_stop()
         print(f"{img_name}最大匹配度：{self.max_val}")
         if self.max_val < 0.93:
@@ -152,10 +164,10 @@ class Utils():
 
     # 画点（测试用）
     def draw_circle(self):
-        cv2.circle(self.target_img, self.pointUpLeft, 2, (255, 255, 255), -1)
-        cv2.circle(self.target_img, self.pointCentre, 2, (255, 255, 255), -1)
-        cv2.circle(self.target_img, self.pointLowRight, 2, (255, 255, 255), -1)
-        cv2.imwrite("shot_with_circle.png", self.target_img)
+        cv2.circle(self.target_img, self.pointUpLeft, 10, (255, 255, 255), 5)
+        cv2.circle(self.target_img, self.pointCentre, 10, (255, 255, 255), 5)
+        cv2.circle(self.target_img, self.pointLowRight, 10, (255, 255, 255), 5)
+        self.show_img()
 
     # 获取匹配到的坐标
     def get_coord(self):
@@ -225,6 +237,8 @@ class Command():
             if self.stop:
                 self.stop = False
                 break
+            # 防止截图太快重复点击
+            time.sleep(1)
 
     # 故事模式（只重试，过关之后不挑战下一关）
     def story_mode_retry_only(self):
