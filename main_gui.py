@@ -160,7 +160,7 @@ class Ui_MainWindow(object):
 
     def retranslateUi(self, MainWindow):
         _translate = QtCore.QCoreApplication.translate
-        MainWindow.setWindowTitle(_translate("MainWindow", "afk-arena-tools V1.0.6"))
+        MainWindow.setWindowTitle(_translate("MainWindow", "afk-arena-tools V1.0.7"))
         self.groupBox.setTitle(_translate("MainWindow", "故事模式"))
         self.pushButton.setText(_translate("MainWindow", "自动重试"))
         self.pushButton_2.setText(_translate("MainWindow", "自动推图"))
@@ -184,11 +184,11 @@ class Ui_MainWindow(object):
         self.tabWidget.setTabText(self.tabWidget.indexOf(self.tab), _translate("MainWindow", "功能区"))
         self.groupBox_5.setTitle(_translate("MainWindow", "ADB功能区"))
         self.pushButton_21.setText(_translate("MainWindow", "WIFI连接手机"))
-        self.pushButton_22.setText(_translate("MainWindow", "获取截图"))
+        self.pushButton_22.setText(_translate("MainWindow", "获取截图（弹窗）"))
         self.pushButton_23.setText(_translate("MainWindow", "USB连接手机"))
         self.pushButton_29.setText(_translate("MainWindow", "保存"))
-        self.groupBox_6.setTitle(_translate("MainWindow", "待定"))
-        self.pushButton_25.setText(_translate("MainWindow", "PushButton"))
+        self.groupBox_6.setTitle(_translate("MainWindow", "ADB功能区"))
+        self.pushButton_25.setText(_translate("MainWindow", "保存截图"))
         self.pushButton_26.setText(_translate("MainWindow", "PushButton"))
         self.pushButton_27.setText(_translate("MainWindow", "PushButton"))
         self.pushButton_28.setText(_translate("MainWindow", "PushButton"))

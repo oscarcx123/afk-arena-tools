@@ -75,7 +75,7 @@ class Utils():
 
 
     # 获取截图
-    def get_img(self, pop_up_window=False):
+    def get_img(self, pop_up_window=False, save_img=False):
         pipe = subprocess.Popen("adb exec-out screencap -p", stdin=subprocess.PIPE, stdout=subprocess.PIPE, shell=True)
         image_bytes = pipe.stdout.read()
 
@@ -84,6 +84,8 @@ class Utils():
             self.error_stop()
         else:
             self.target_img = cv2.imdecode(np.fromstring(image_bytes, dtype='uint8'), cv2.IMREAD_COLOR)
+            if save_img:
+                cv2.imwrite('screenshot.png', self.target_img)
             if pop_up_window:
                 self.show_img()
 
@@ -214,7 +216,7 @@ class Command():
             "check_boss_stage": "self.exec_status = self.utils.match('challenge_boss_button.png')",
             "check_bundle_pop_up": "self.exec_status = self.utils.match('bundle_pop_up.png')",
             "click_challenge_boss_fp": "self.exec_status = self.utils.match('challenge_boss_fp_button.png')",
-            
+            "check_level_up": "self.exec_status = self.utils.match('level_up.png')"
         }
         # 是否执行指令
         self.exec_status = None
@@ -256,7 +258,8 @@ class Command():
             "click_battle",
             "check_boss_stage",
             "click_challenge_boss_fp",
-            "check_bundle_pop_up"
+            "check_bundle_pop_up",
+            "check_level_up"
         ]
         self.exec_func(cmd_list)
 
@@ -327,3 +330,8 @@ class Command():
         self.utils.tap(0.5, 0.9, percentage=True)
         self.utils.write_log("检测到有限时礼包弹窗并自动关闭成功！")
     
+    # 检测升级弹窗
+    # 如果过关之后弹出升级窗口，直接点击屏幕下方关闭
+    def check_level_up(self):
+        self.utils.tap(0.5, 0.9, percentage=True)
+        self.utils.write_log("检测到升级弹窗并自动关闭成功！")

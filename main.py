@@ -29,7 +29,7 @@ class MainWin(QMainWindow):
         self.init_interface()
         self.init_signal()
         self.write_log("初始化完成！")
-        self.write_log("afk-arena-tools是开源软件，如果有任何问题建议想法，欢迎提issue，repo地址可以在“帮助 > 关于”看到")
+        self.write_log("afk-arena-tools是开源软件，如果有任何问题建议想法，欢迎提issue或PR~")
         self.show()
         sys.exit(self.app.exec_())
 
@@ -64,6 +64,7 @@ class MainWin(QMainWindow):
         self.ui.pushButton_21.clicked.connect(self.afk.utils.adb_connect)
         self.ui.pushButton_22.clicked.connect(partial(self.afk.utils.get_img, pop_up_window=True))
         self.ui.pushButton_23.clicked.connect(self.afk.utils.adb_connect_usb)
+        self.ui.pushButton_25.clicked.connect(partial(self.afk.utils.get_img, save_img=True))
         self.ui.pushButton_29.clicked.connect(self.get_new_wifi_adb_addr)
         self.ui.checkBox.clicked.connect(self.check_ratio)
         self.ui.radioButton.clicked.connect(partial(self.change_resolution, 100))

@@ -1,7 +1,7 @@
 import os
 import zipfile
 
-version = "1.0.6"
+version = "1.0.7"
 
 core_file_list = [
     'about_gui.py',

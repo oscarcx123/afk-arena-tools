@@ -11,7 +11,7 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>afk-arena-tools V1.0.6</string>
+   <string>afk-arena-tools V1.0.7</string>
   </property>
   <widget class="QWidget" name="centralwidget">
    <widget class="QTabWidget" name="tabWidget">
@@ -340,7 +340,7 @@
         </rect>
        </property>
        <property name="text">
-        <string>获取截图</string>
+        <string>获取截图（弹窗）</string>
        </property>
       </widget>
       <widget class="QPushButton" name="pushButton_23">
@@ -390,7 +390,7 @@
        </rect>
       </property>
       <property name="title">
-       <string>待定</string>
+       <string>ADB功能区</string>
       </property>
       <widget class="QPushButton" name="pushButton_25">
        <property name="geometry">
@@ -402,7 +402,7 @@
         </rect>
        </property>
        <property name="text">
-        <string>PushButton</string>
+        <string>保存截图</string>
        </property>
       </widget>
       <widget class="QPushButton" name="pushButton_26">
