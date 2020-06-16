@@ -43,6 +43,8 @@ class Utils():
         self.scale_percentage = 100
         # log临时堆栈，输出后会pop掉
         self.text = []
+        # 图像匹配阈值
+        self.threshold = 0.93
         
         # 加载图像资源
         self.load_res()
@@ -107,12 +109,12 @@ class Utils():
         # 匹配
         try:
             result = cv2.matchTemplate(self.target_img, find_img, cv2.TM_CCOEFF_NORMED)
-            min_val,self.max_val,min_loc,max_loc = cv2.minMaxLoc(result)
+            min_val, max_val, min_loc, max_loc = cv2.minMaxLoc(result)
         except:
             self.write_log(f"OpenCV对比失败！请使用杂项中的截图功能来测试能否正常截图！")
             self.error_stop()
-        print(f"{img_name}最大匹配度：{self.max_val}")
-        if self.max_val < 0.93:
+        print(f"{img_name}最大匹配度：{max_val}")
+        if max_val < self.threshold:
             return False
         
         # 计算位置
@@ -123,10 +125,51 @@ class Utils():
             self.draw_circle()
         return True
 
+    # 匹配多个结果
+    def multiple_match(self, img_name):
+        # 用于存放匹配结果
+        match_res = []
+        # 从加载好的图像资源中获取数据
+        find_img = self.res[img_name]["img"]
+        find_height = self.res[img_name]["height"]
+        find_width = self.res[img_name]["width"]
+
+        # OpenCV匹配多个结果
+        # https://stackoverflow.com/a/58514954/12766614
+        try:
+            result = cv2.matchTemplate(self.target_img, find_img, cv2.TM_CCOEFF_NORMED)
+            # max_val设置为1，从而能够进入循环
+            max_val = 1
+            cnt = 0
+            while max_val > self.threshold:
+                min_val, max_val, min_loc, max_loc = cv2.minMaxLoc(result)
+                if max_val > self.threshold:
+                    # 抹除最大值周围的数值，从而可以在下一次找到其它位置的（第二）最大值
+                    result[max_loc[1]-find_height//2:max_loc[1]+find_height//2+1, max_loc[0]-find_width//2:max_loc[0]+find_width//2+1] = 0
+                    # 计算位置
+                    pointUpLeft = max_loc
+                    pointLowRight = (int(max_loc[0] + find_width), int(max_loc[1] + find_height))
+                    pointCentre = (int(max_loc[0] + (find_width / 2)), int(max_loc[1] + (find_height / 2)))
+                    # image = cv2.rectangle(image, (max_loc[0],max_loc[1]), (max_loc[0]+find_width+1, max_loc[1]+find_height+1), (0,0,0))
+                    # cv2.imwrite(f'output_{cnt}.png', 255*result) 灰阶输出，越亮匹配度越高
+                    cnt += 1
+                    match_res.append(pointCentre)
+                    print(f"{img_name}找到{cnt}个，匹配度：{max_val}")
+        except:
+            self.write_log(f"OpenCV对比失败！请使用杂项中的截图功能来测试能否正常截图！")
+            self.error_stop()
+        return match_res
+
+
     # 立即截图，然后匹配，返回boolean
     def current_match(self, img_name):
         self.get_img()
         return self.match(img_name)
+
+    # 立即截图，然后匹配多个，返回数组，内含若干匹配成功的tuple
+    def current_multiple_match(self, img_name):
+        self.get_img()
+        return self.multiple_match(img_name)
     
     # 点击（传入坐标）
     # 也可以接受比例形式坐标，例如(0.5, 0.5, percentage=True)就是点屏幕中心
@@ -238,6 +281,15 @@ class Command():
             "click_friend_summon_pool": "self.exec_status = self.utils.match('friend_summon_pool.png')",
             "click_guild_button": "self.exec_status = self.utils.match('guild_button.png')",
             "click_guild_boss_button": "self.exec_status = self.utils.match('guild_boss_button.png')",
+            "click_arena_button": "self.exec_status = self.utils.match('arena_button.png')",
+            "click_normal_arena_button": "self.exec_status = self.utils.match('normal_arena_button.png')",
+            "click_arena_challenge_button": "self.exec_status = self.utils.match('arena_challenge_button.png')",
+            "click_skip_battle_button": "self.exec_status = self.utils.match('skip_battle_button.png')",
+            "click_bounty_board_button": "self.exec_status = self.utils.match('bounty_board_button.png')",
+            "click_bounty_board_dispatch_all_button": "self.exec_status = self.utils.match('bounty_board_dispatch_all_button.png')",
+            "click_bounty_board_confirm_button": "self.exec_status = self.utils.match('bounty_board_confirm_button.png')",
+            "click_tower_button": "self.exec_status = self.utils.match('tower_button.png')",
+            "click_tower_main_button": "self.exec_status = self.utils.match('tower_main_button.png')"
         }
         # 是否执行指令
         self.exec_status = None
@@ -250,6 +302,10 @@ class Command():
         self.dark_forest_coord = None
         # “战役”点击坐标
         self.campaign_coord = None
+        # 是否在执行日常模式
+        self.is_daily_mode = False
+        # 是否停止执行日常模式
+        self.kill_daily_mode = False
 
     # 自动执行符合触发条件的指令
     def exec_func(self, cmd_list, exit_cond=None):
@@ -277,7 +333,7 @@ class Command():
                 self.stop = False
                 break
             # 防止截图太快重复点击
-            time.sleep(1.5)
+            time.sleep(2)
 
     # 故事模式（只重试，过关之后不挑战下一关）
     def story_mode_retry_only(self):
@@ -321,6 +377,7 @@ class Command():
 
     # 日常任务模式
     def daily_mode(self):
+        self.is_daily_mode = True
         # 初始化“领地”、“野外”、“战役”的坐标
         if self.ranhorn_coord is None or self.dark_forest_coord is None or self.campaign_coord is None:
             self.utils.get_img()
@@ -334,6 +391,7 @@ class Command():
                 self.utils.match("campaign_icon_chosen.png")
             self.campaign_coord = self.utils.get_coord()
         
+        # 获取日常任务勾选信息
         mission_list = []
         if self.utils.ui.checkBox_2.isChecked():
             mission_list.append("daily_challenge_boss")
@@ -346,15 +404,18 @@ class Command():
         if self.utils.ui.checkBox_7.isChecked():
             mission_list.append("daily_guild_boss")
         if self.utils.ui.checkBox_8.isChecked():
-            mission_list.append("daily_send_heart")
+            mission_list.append("daily_arena_battle")
         if self.utils.ui.checkBox_9.isChecked():
-            mission_list.append("daily_send_heart")
+            mission_list.append("daily_bounty_board")
         if self.utils.ui.checkBox_10.isChecked():
-            mission_list.append("daily_send_heart")
+            mission_list.append("daily_tower")
         if self.utils.ui.checkBox_11.isChecked():
-            mission_list.append("daily_send_heart")
+            pass
         if self.utils.ui.checkBox_12.isChecked():
-            mission_list.append("daily_send_heart")
+            pass
+        if self.utils.ui.checkBox_13.isChecked():
+            pass
+
         # 箱子会在所有任务开始前后分别领取一次
         if self.utils.ui.checkBox_3.isChecked():
             self.daily_idle_chest_1st_exec = True
@@ -365,7 +426,16 @@ class Command():
         for mission in mission_list:
             func = "self." + mission + "()"
             exec(func)
+            if self.afk.kill_daily_mode:
+                break
             time.sleep(2)
+
+        if self.afk.kill_daily_mode:
+            self.afk.kill_daily_mode = False
+            self.utils.write_log("【日常任务】中断执行！")
+        else:
+            self.utils.write_log("【日常任务】全部完成！")
+        self.utils.error_stop()
     
     # 日常任务 - 挑战首领1次（20pts）
     def daily_challenge_boss(self):
@@ -527,6 +597,130 @@ class Command():
             self.utils.tap()
             time.sleep(2)
 
+
+    # 日常任务 - 参加竞技场挑战1次（20pts）
+    def daily_arena_battle(self):
+        self.click_dark_forest_icon()
+        cmd_list = [
+            "click_arena_button",
+            "click_normal_arena_button",
+            "click_arena_challenge_button"
+        ]
+        self.exec_func(cmd_list, exit_cond="afterExecFunc@click_arena_challenge_button")
+        mission_complete = False
+        time.sleep(1)
+        # 免费票打完为止
+        while self.utils.current_match('arena_free_battle_button.png'):
+            # 寻找y值最大的坐标（最下方的挑战）
+            res = self.utils.multiple_match('arena_free_battle_button.png')
+            max_y_idx = 0
+            if len(res) > 1:
+                for idx in range(len(res) - 1):
+                    if res[max_y_idx] < res[idx]:
+                        max_y_idx = idx
+            
+            # 使用免费票
+            self.utils.tap(res[max_y_idx][0], res[max_y_idx][1], randomize=False)
+            time.sleep(2)
+            
+            # 点击战斗
+            cmd_list = [
+                "click_battle",
+                "click_skip_battle_button",
+            ]
+            self.exec_func(cmd_list, exit_cond="afterExecFunc@click_skip_battle_button")
+            time.sleep(2)
+            
+            # 获得奖励界面（点空白处关闭）
+            self.utils.tap(0.5, 0.9, percentage=True)
+            time.sleep(2)
+            
+            # 战斗结算界面（点空白处关闭）
+            self.utils.tap(0.5, 0.9, percentage=True)
+            time.sleep(2)
+
+            mission_complete = True
+
+        # 免费票打完了，回退到主界面
+        if mission_complete:
+            self.utils.write_log("【日常任务】完成 - 参加竞技场挑战1次（20pts）！")
+        else:
+            self.utils.write_log("【日常任务】执行失败 - 参加竞技场挑战1次（20pts）！原因：已经用完免费票")
+        # 依次点击空白，返回，返回
+        self.utils.tap(0.5, 0.9, percentage=True)
+        time.sleep(2)
+        self.utils.current_match('ui_return_button.png')
+        self.utils.tap()
+        time.sleep(2)
+        self.utils.tap()
+
+
+    # 日常任务 - 接受3个悬赏任务（10pts）
+    def daily_bounty_board(self):
+        self.click_dark_forest_icon()
+        # 个人悬赏 - 一键派遣
+        cmd_list = [
+            "click_bounty_board_button",
+            "click_bounty_board_dispatch_all_button",
+            "click_bounty_board_confirm_button"
+        ]
+        self.exec_func(cmd_list, exit_cond="afterExecFunc@click_bounty_board_confirm_button")
+        time.sleep(1)
+        
+        # 个人悬赏 - 一键领取
+        self.utils.current_match("bounty_board_collect_all_button.png")
+        self.utils.tap()
+        time.sleep(1)
+
+        # 切换到团队悬赏页面
+        self.utils.current_match("bounty_board_team_tab.png")
+        self.utils.tap()
+        time.sleep(1)
+        
+        # 团队悬赏 - 一键派遣
+        cmd_list = [
+            "click_bounty_board_dispatch_all_button",
+            "click_bounty_board_confirm_button"
+        ]
+        self.exec_func(cmd_list, exit_cond="afterExecFunc@click_bounty_board_confirm_button")
+        time.sleep(1)
+        
+        # 团队悬赏 - 一键领取
+        self.utils.current_match("bounty_board_collect_all_button.png")
+        self.utils.tap()
+        time.sleep(1)
+
+        # 点击返回
+        self.utils.current_match('ui_return_button.png')
+        self.utils.tap()
+        time.sleep(2)
+        
+        self.utils.write_log("【日常任务】完成 - 接受3个悬赏任务（10pts）！")
+        
+
+    # 日常任务 - 挑战王座之塔1次（10pts）
+    def daily_tower(self):
+        self.click_dark_forest_icon()
+        cmd_list = [
+            "click_battle_exit",
+            "click_battle_pause",
+            "click_tower_button",
+            "click_tower_main_button",
+            "click_challenge",
+            "click_battle"
+        ]
+        self.exec_func(cmd_list, exit_cond="afterExecFunc@click_battle_exit")
+        time.sleep(1)
+
+        # 点击返回，返回
+        self.utils.current_match('ui_return_button.png')
+        self.utils.tap()
+        time.sleep(2)
+        self.utils.tap()
+        time.sleep(2)
+
+        self.utils.write_log("【日常任务】完成 - 挑战王座之塔1次（10pts）！")
+
     # 点击“领地”
     def click_ranhorn_icon(self):
         self.utils.tap(self.ranhorn_coord[0], self.ranhorn_coord[1])
@@ -642,5 +836,41 @@ class Command():
 
     # 点击进入“公会”的“公会狩猎”
     def click_guild_boss_button(self):
+        self.utils.tap()
+    
+    # 点击进入“竞技场”
+    def click_arena_button(self):
+        self.utils.tap()
+
+    # 点击进入“普通竞技场”
+    def click_normal_arena_button(self):
+        self.utils.tap()
+
+    # “普通竞技场”中点击“挑战”
+    def click_arena_challenge_button(self):
+        self.utils.tap()
+
+    # 战斗中点击“跳过战斗”图标
+    def click_skip_battle_button(self):
+        self.utils.tap()
+
+    # 点击“悬赏栏”
+    def click_bounty_board_button(self):
+        self.utils.tap()
+
+    # “悬赏栏”点击“一键派遣”
+    def click_bounty_board_dispatch_all_button(self):
+        self.utils.tap()
+
+    # “悬赏栏”的“一键派遣”点击“确认”
+    def click_bounty_board_confirm_button(self):
+        self.utils.tap()
+
+    # 点击“王座之塔”
+    def click_tower_button(self):
+        self.utils.tap()
+
+    # 点击“王座之塔”的主塔
+    def click_tower_main_button(self):
         self.utils.tap()
     

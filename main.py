@@ -40,6 +40,10 @@ class MainWin(QMainWindow):
         self.help_window = Help()
 
 
+    # 配置文件模块初始化
+    def init_conf(self):
+        pass
+    
     # 图形界面数值的初始化
     def init_interface(self):
         # 当前正在执行的功能
@@ -49,6 +53,19 @@ class MainWin(QMainWindow):
         # 默认wifi_adb地址
         self.ui.lineEdit.setText(self.afk.utils.wifi_adb_addr)
         self.ui.radioButton.setChecked(True)
+        # 日常任务默认勾选
+        self.ui.checkBox_2.setChecked(True)
+        self.ui.checkBox_3.setChecked(True)
+        self.ui.checkBox_4.setChecked(True)
+        self.ui.checkBox_5.setChecked(True)
+        self.ui.checkBox_6.setChecked(True)
+        self.ui.checkBox_7.setChecked(True)
+        self.ui.checkBox_8.setChecked(True)
+        self.ui.checkBox_9.setChecked(True)
+        self.ui.checkBox_10.setChecked(True)
+        self.ui.checkBox_11.setCheckable(False)
+        self.ui.checkBox_12.setCheckable(False)
+        self.ui.checkBox_13.setCheckable(False)
 
 
     # 信号和槽（绑定事件）初始化
@@ -97,6 +114,8 @@ class MainWin(QMainWindow):
             self.curr_func = None
             self.write_log("成功停止当前执行的功能！")
             self.afk.utils.stop_callback = True
+            if self.afk.is_daily_mode:
+                self.afk.kill_daily_mode = True
         else:
             self.write_log("当前没有正在执行的功能！")
 

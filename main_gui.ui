@@ -273,7 +273,7 @@
         </rect>
        </property>
        <property name="text">
-        <string>商铺自动买道具</string>
+        <string>Placeholder</string>
        </property>
       </widget>
       <widget class="QCheckBox" name="checkBox_12">
@@ -286,7 +286,7 @@
         </rect>
        </property>
        <property name="text">
-        <string>领取每日白嫖礼包</string>
+        <string>Placeholder</string>
        </property>
       </widget>
       <widget class="QCheckBox" name="checkBox_13">
@@ -299,7 +299,7 @@
         </rect>
        </property>
        <property name="text">
-        <string>领取赠送友情点</string>
+        <string>Placeholder</string>
        </property>
       </widget>
      </widget>
@@ -358,9 +358,9 @@
      <widget class="QTextBrowser" name="textBrowser">
       <property name="geometry">
        <rect>
-        <x>5</x>
+        <x>10</x>
         <y>310</y>
-        <width>771</width>
+        <width>761</width>
         <height>192</height>
        </rect>
       </property>
@@ -368,14 +368,113 @@
     </widget>
     <widget class="QWidget" name="tab_2">
      <attribute name="title">
-      <string>杂项</string>
+      <string>设置</string>
      </attribute>
-     <widget class="QGroupBox" name="groupBox_5">
+     <widget class="QGroupBox" name="groupBox_7">
+      <property name="geometry">
+       <rect>
+        <x>520</x>
+        <y>10</y>
+        <width>251</width>
+        <height>241</height>
+       </rect>
+      </property>
+      <property name="title">
+       <string>分辨率设置</string>
+      </property>
+      <widget class="QCheckBox" name="checkBox">
+       <property name="geometry">
+        <rect>
+         <x>10</x>
+         <y>120</y>
+         <width>221</width>
+         <height>19</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>使用720/1080的比例</string>
+       </property>
+      </widget>
+      <widget class="QRadioButton" name="radioButton">
+       <property name="geometry">
+        <rect>
+         <x>10</x>
+         <y>30</y>
+         <width>221</width>
+         <height>19</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>1440P / 2K (1440x2560)</string>
+       </property>
+      </widget>
+      <widget class="QRadioButton" name="radioButton_2">
+       <property name="geometry">
+        <rect>
+         <x>10</x>
+         <y>60</y>
+         <width>221</width>
+         <height>19</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>1080P (1080x1920)</string>
+       </property>
+      </widget>
+      <widget class="QRadioButton" name="radioButton_3">
+       <property name="geometry">
+        <rect>
+         <x>10</x>
+         <y>90</y>
+         <width>221</width>
+         <height>19</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>720P (720x1280)</string>
+       </property>
+      </widget>
+     </widget>
+     <widget class="QGroupBox" name="groupBox_6">
       <property name="geometry">
        <rect>
         <x>10</x>
         <y>10</y>
-        <width>501</width>
+        <width>491</width>
+        <height>241</height>
+       </rect>
+      </property>
+      <property name="title">
+       <string>配置文件设置</string>
+      </property>
+      <widget class="QLabel" name="label">
+       <property name="geometry">
+        <rect>
+         <x>50</x>
+         <y>60</y>
+         <width>371</width>
+         <height>121</height>
+        </rect>
+       </property>
+       <property name="font">
+        <font>
+         <pointsize>30</pointsize>
+        </font>
+       </property>
+       <property name="text">
+        <string>啥也没有</string>
+       </property>
+       <property name="alignment">
+        <set>Qt::AlignCenter</set>
+       </property>
+      </widget>
+     </widget>
+     <widget class="QGroupBox" name="groupBox_5">
+      <property name="geometry">
+       <rect>
+        <x>10</x>
+        <y>260</y>
+        <width>761</width>
         <height>241</height>
        </rect>
       </property>
@@ -494,71 +593,6 @@
        </property>
        <property name="text">
         <string>PushButton</string>
-       </property>
-      </widget>
-     </widget>
-     <widget class="QGroupBox" name="groupBox_7">
-      <property name="geometry">
-       <rect>
-        <x>520</x>
-        <y>10</y>
-        <width>251</width>
-        <height>241</height>
-       </rect>
-      </property>
-      <property name="title">
-       <string>分辨率设置</string>
-      </property>
-      <widget class="QCheckBox" name="checkBox">
-       <property name="geometry">
-        <rect>
-         <x>10</x>
-         <y>180</y>
-         <width>221</width>
-         <height>34</height>
-        </rect>
-       </property>
-       <property name="text">
-        <string>使用720/1080的比例</string>
-       </property>
-      </widget>
-      <widget class="QRadioButton" name="radioButton">
-       <property name="geometry">
-        <rect>
-         <x>10</x>
-         <y>30</y>
-         <width>221</width>
-         <height>41</height>
-        </rect>
-       </property>
-       <property name="text">
-        <string>1440P / 2K (1440x2560)</string>
-       </property>
-      </widget>
-      <widget class="QRadioButton" name="radioButton_2">
-       <property name="geometry">
-        <rect>
-         <x>10</x>
-         <y>80</y>
-         <width>221</width>
-         <height>41</height>
-        </rect>
-       </property>
-       <property name="text">
-        <string>1080P (1080x1920)</string>
-       </property>
-      </widget>
-      <widget class="QRadioButton" name="radioButton_3">
-       <property name="geometry">
-        <rect>
-         <x>10</x>
-         <y>130</y>
-         <width>221</width>
-         <height>41</height>
-        </rect>
-       </property>
-       <property name="text">
-        <string>720P (720x1280)</string>
        </property>
       </widget>
      </widget>
