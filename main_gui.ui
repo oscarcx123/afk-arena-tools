@@ -11,7 +11,7 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>afk-arena-tools V1.0.7</string>
+   <string>afk-arena-tools V1.1.0</string>
   </property>
   <widget class="QWidget" name="centralwidget">
    <widget class="QTabWidget" name="tabWidget">
@@ -20,7 +20,7 @@
       <x>0</x>
       <y>0</y>
       <width>791</width>
-      <height>531</height>
+      <height>541</height>
      </rect>
     </property>
     <property name="currentIndex">
@@ -36,17 +36,17 @@
         <x>10</x>
         <y>10</y>
         <width>191</width>
-        <height>281</height>
+        <height>141</height>
        </rect>
       </property>
       <property name="title">
-       <string>故事模式</string>
+       <string>主线模式</string>
       </property>
       <widget class="QPushButton" name="pushButton">
        <property name="geometry">
         <rect>
          <x>20</x>
-         <y>40</y>
+         <y>30</y>
          <width>151</width>
          <height>40</height>
         </rect>
@@ -59,7 +59,7 @@
        <property name="geometry">
         <rect>
          <x>20</x>
-         <y>100</y>
+         <y>80</y>
          <width>151</width>
          <height>40</height>
         </rect>
@@ -68,40 +68,14 @@
         <string>自动推图</string>
        </property>
       </widget>
-      <widget class="QPushButton" name="pushButton_3">
-       <property name="geometry">
-        <rect>
-         <x>20</x>
-         <y>160</y>
-         <width>151</width>
-         <height>40</height>
-        </rect>
-       </property>
-       <property name="text">
-        <string>PushButton</string>
-       </property>
-      </widget>
-      <widget class="QPushButton" name="pushButton_4">
-       <property name="geometry">
-        <rect>
-         <x>20</x>
-         <y>220</y>
-         <width>151</width>
-         <height>40</height>
-        </rect>
-       </property>
-       <property name="text">
-        <string>PushButton</string>
-       </property>
-      </widget>
      </widget>
      <widget class="QGroupBox" name="groupBox_2">
       <property name="geometry">
        <rect>
-        <x>200</x>
-        <y>10</y>
+        <x>10</x>
+        <y>160</y>
         <width>191</width>
-        <height>281</height>
+        <height>141</height>
        </rect>
       </property>
       <property name="title">
@@ -111,7 +85,7 @@
        <property name="geometry">
         <rect>
          <x>20</x>
-         <y>40</y>
+         <y>30</y>
          <width>151</width>
          <height>40</height>
         </rect>
@@ -124,7 +98,7 @@
        <property name="geometry">
         <rect>
          <x>20</x>
-         <y>100</y>
+         <y>80</y>
          <width>151</width>
          <height>40</height>
         </rect>
@@ -163,124 +137,189 @@
      <widget class="QGroupBox" name="groupBox_3">
       <property name="geometry">
        <rect>
-        <x>390</x>
+        <x>210</x>
         <y>10</y>
-        <width>191</width>
-        <height>281</height>
+        <width>561</width>
+        <height>211</height>
        </rect>
       </property>
       <property name="title">
-       <string>待定</string>
+       <string>每日任务</string>
       </property>
-      <widget class="QPushButton" name="pushButton_9">
+      <widget class="QCheckBox" name="checkBox_2">
        <property name="geometry">
         <rect>
          <x>20</x>
-         <y>40</y>
-         <width>151</width>
-         <height>40</height>
+         <y>30</y>
+         <width>251</width>
+         <height>19</height>
         </rect>
        </property>
        <property name="text">
-        <string>PushButton</string>
+        <string>挑战首领1次（20pts）</string>
        </property>
       </widget>
-      <widget class="QPushButton" name="pushButton_10">
+      <widget class="QCheckBox" name="checkBox_3">
        <property name="geometry">
         <rect>
          <x>20</x>
-         <y>100</y>
-         <width>151</width>
-         <height>40</height>
+         <y>60</y>
+         <width>251</width>
+         <height>19</height>
         </rect>
        </property>
        <property name="text">
-        <string>PushButton</string>
+        <string>领取战利品2次（10pts）</string>
        </property>
       </widget>
-      <widget class="QPushButton" name="pushButton_11">
+      <widget class="QCheckBox" name="checkBox_4">
        <property name="geometry">
         <rect>
          <x>20</x>
-         <y>160</y>
-         <width>151</width>
-         <height>40</height>
+         <y>90</y>
+         <width>251</width>
+         <height>19</height>
         </rect>
        </property>
        <property name="text">
-        <string>PushButton</string>
+        <string>赠送好友友情点1次（10pts）</string>
        </property>
       </widget>
-      <widget class="QPushButton" name="pushButton_12">
+      <widget class="QCheckBox" name="checkBox_5">
        <property name="geometry">
         <rect>
          <x>20</x>
-         <y>220</y>
-         <width>151</width>
-         <height>40</height>
+         <y>120</y>
+         <width>251</width>
+         <height>19</height>
         </rect>
        </property>
        <property name="text">
-        <string>PushButton</string>
+        <string>快速挂机1次（10pts）</string>
+       </property>
+      </widget>
+      <widget class="QCheckBox" name="checkBox_6">
+       <property name="geometry">
+        <rect>
+         <x>20</x>
+         <y>150</y>
+         <width>251</width>
+         <height>19</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>在月桂酒馆召唤英雄1次（20pts）</string>
+       </property>
+      </widget>
+      <widget class="QCheckBox" name="checkBox_7">
+       <property name="geometry">
+        <rect>
+         <x>20</x>
+         <y>180</y>
+         <width>251</width>
+         <height>19</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>参加公会团队狩猎1次（10pts）</string>
+       </property>
+      </widget>
+      <widget class="QCheckBox" name="checkBox_8">
+       <property name="geometry">
+        <rect>
+         <x>290</x>
+         <y>30</y>
+         <width>251</width>
+         <height>19</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>参加竞技场挑战1次（20pts）</string>
+       </property>
+      </widget>
+      <widget class="QCheckBox" name="checkBox_9">
+       <property name="geometry">
+        <rect>
+         <x>290</x>
+         <y>60</y>
+         <width>251</width>
+         <height>19</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>接受3个悬赏任务（10pts）</string>
+       </property>
+      </widget>
+      <widget class="QCheckBox" name="checkBox_10">
+       <property name="geometry">
+        <rect>
+         <x>290</x>
+         <y>90</y>
+         <width>251</width>
+         <height>19</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>挑战王座之塔1次（10pts）</string>
+       </property>
+      </widget>
+      <widget class="QCheckBox" name="checkBox_11">
+       <property name="geometry">
+        <rect>
+         <x>290</x>
+         <y>120</y>
+         <width>251</width>
+         <height>19</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>商铺自动买道具</string>
+       </property>
+      </widget>
+      <widget class="QCheckBox" name="checkBox_12">
+       <property name="geometry">
+        <rect>
+         <x>290</x>
+         <y>150</y>
+         <width>251</width>
+         <height>19</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>领取每日白嫖礼包</string>
+       </property>
+      </widget>
+      <widget class="QCheckBox" name="checkBox_13">
+       <property name="geometry">
+        <rect>
+         <x>290</x>
+         <y>180</y>
+         <width>251</width>
+         <height>19</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>领取赠送友情点</string>
        </property>
       </widget>
      </widget>
      <widget class="QGroupBox" name="groupBox_4">
       <property name="geometry">
        <rect>
-        <x>580</x>
-        <y>10</y>
-        <width>191</width>
-        <height>281</height>
+        <x>210</x>
+        <y>230</y>
+        <width>561</width>
+        <height>71</height>
        </rect>
       </property>
       <property name="title">
        <string>流程控制</string>
       </property>
-      <widget class="QPushButton" name="pushButton_17">
-       <property name="geometry">
-        <rect>
-         <x>20</x>
-         <y>40</y>
-         <width>151</width>
-         <height>40</height>
-        </rect>
-       </property>
-       <property name="text">
-        <string>PushButton</string>
-       </property>
-      </widget>
-      <widget class="QPushButton" name="pushButton_18">
-       <property name="geometry">
-        <rect>
-         <x>20</x>
-         <y>100</y>
-         <width>151</width>
-         <height>40</height>
-        </rect>
-       </property>
-       <property name="text">
-        <string>PushButton</string>
-       </property>
-      </widget>
-      <widget class="QPushButton" name="pushButton_19">
-       <property name="geometry">
-        <rect>
-         <x>20</x>
-         <y>160</y>
-         <width>151</width>
-         <height>40</height>
-        </rect>
-       </property>
-       <property name="text">
-        <string>PushButton</string>
-       </property>
-      </widget>
       <widget class="QPushButton" name="pushButton_20">
        <property name="geometry">
         <rect>
-         <x>20</x>
-         <y>220</y>
+         <x>380</x>
+         <y>20</y>
          <width>151</width>
          <height>40</height>
         </rect>
@@ -289,12 +328,38 @@
         <string>停止</string>
        </property>
       </widget>
+      <widget class="QPushButton" name="pushButton_9">
+       <property name="geometry">
+        <rect>
+         <x>20</x>
+         <y>20</y>
+         <width>151</width>
+         <height>41</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>开始每日任务</string>
+       </property>
+      </widget>
+      <widget class="QPushButton" name="pushButton_10">
+       <property name="geometry">
+        <rect>
+         <x>200</x>
+         <y>20</y>
+         <width>151</width>
+         <height>41</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>没用</string>
+       </property>
+      </widget>
      </widget>
      <widget class="QTextBrowser" name="textBrowser">
       <property name="geometry">
        <rect>
         <x>5</x>
-        <y>280</y>
+        <y>310</y>
         <width>771</width>
         <height>192</height>
        </rect>
@@ -310,7 +375,7 @@
        <rect>
         <x>10</x>
         <y>10</y>
-        <width>251</width>
+        <width>501</width>
         <height>241</height>
        </rect>
       </property>
@@ -321,7 +386,7 @@
        <property name="geometry">
         <rect>
          <x>10</x>
-         <y>90</y>
+         <y>80</y>
          <width>221</width>
          <height>40</height>
         </rect>
@@ -334,7 +399,7 @@
        <property name="geometry">
         <rect>
          <x>10</x>
-         <y>190</y>
+         <y>180</y>
          <width>221</width>
          <height>40</height>
         </rect>
@@ -347,22 +412,22 @@
        <property name="geometry">
         <rect>
          <x>10</x>
-         <y>140</y>
+         <y>130</y>
          <width>221</width>
          <height>40</height>
         </rect>
        </property>
        <property name="text">
-        <string>USB连接手机</string>
+        <string>运行adb devices</string>
        </property>
       </widget>
       <widget class="QLineEdit" name="lineEdit">
        <property name="geometry">
         <rect>
          <x>10</x>
-         <y>40</y>
-         <width>171</width>
-         <height>34</height>
+         <y>30</y>
+         <width>161</width>
+         <height>40</height>
         </rect>
        </property>
       </widget>
@@ -370,7 +435,7 @@
        <property name="geometry">
         <rect>
          <x>180</x>
-         <y>40</y>
+         <y>30</y>
          <width>51</width>
          <height>40</height>
         </rect>
@@ -379,24 +444,11 @@
         <string>保存</string>
        </property>
       </widget>
-     </widget>
-     <widget class="QGroupBox" name="groupBox_6">
-      <property name="geometry">
-       <rect>
-        <x>260</x>
-        <y>10</y>
-        <width>251</width>
-        <height>241</height>
-       </rect>
-      </property>
-      <property name="title">
-       <string>ADB功能区</string>
-      </property>
       <widget class="QPushButton" name="pushButton_25">
        <property name="geometry">
         <rect>
-         <x>10</x>
-         <y>40</y>
+         <x>260</x>
+         <y>30</y>
          <width>221</width>
          <height>40</height>
         </rect>
@@ -408,8 +460,8 @@
       <widget class="QPushButton" name="pushButton_26">
        <property name="geometry">
         <rect>
-         <x>10</x>
-         <y>90</y>
+         <x>260</x>
+         <y>80</y>
          <width>221</width>
          <height>40</height>
         </rect>
@@ -421,8 +473,8 @@
       <widget class="QPushButton" name="pushButton_27">
        <property name="geometry">
         <rect>
-         <x>10</x>
-         <y>140</y>
+         <x>260</x>
+         <y>130</y>
          <width>221</width>
          <height>40</height>
         </rect>
@@ -434,8 +486,8 @@
       <widget class="QPushButton" name="pushButton_28">
        <property name="geometry">
         <rect>
-         <x>10</x>
-         <y>190</y>
+         <x>260</x>
+         <y>180</y>
          <width>221</width>
          <height>40</height>
         </rect>
@@ -461,7 +513,7 @@
        <property name="geometry">
         <rect>
          <x>10</x>
-         <y>190</y>
+         <y>180</y>
          <width>221</width>
          <height>34</height>
         </rect>
@@ -474,7 +526,7 @@
        <property name="geometry">
         <rect>
          <x>10</x>
-         <y>40</y>
+         <y>30</y>
          <width>221</width>
          <height>41</height>
         </rect>
@@ -487,7 +539,7 @@
        <property name="geometry">
         <rect>
          <x>10</x>
-         <y>90</y>
+         <y>80</y>
          <width>221</width>
          <height>41</height>
         </rect>
@@ -500,7 +552,7 @@
        <property name="geometry">
         <rect>
          <x>10</x>
-         <y>140</y>
+         <y>130</y>
          <width>221</width>
          <height>41</height>
         </rect>

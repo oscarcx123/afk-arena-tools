@@ -66,6 +66,7 @@ class MainWin(QMainWindow):
         self.ui.pushButton_23.clicked.connect(self.afk.utils.adb_connect_usb)
         self.ui.pushButton_25.clicked.connect(partial(self.afk.utils.get_img, save_img=True))
         self.ui.pushButton_29.clicked.connect(self.get_new_wifi_adb_addr)
+        self.ui.pushButton_9.clicked.connect(partial(self.do_func, self.afk.daily_mode))
         self.ui.checkBox.clicked.connect(self.check_ratio)
         self.ui.radioButton.clicked.connect(partial(self.change_resolution, 100))
         self.ui.radioButton_2.clicked.connect(partial(self.change_resolution, 75))

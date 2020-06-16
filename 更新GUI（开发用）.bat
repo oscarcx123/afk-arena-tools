@@ -1,0 +1,1 @@
+python .\build_tools\auto_pyuic5.py

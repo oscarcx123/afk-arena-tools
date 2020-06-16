@@ -28,7 +28,7 @@
     </font>
    </property>
    <property name="text">
-    <string>afk-arena-tools V1.0.7</string>
+    <string>afk-arena-tools V1.1.0</string>
    </property>
    <property name="alignment">
     <set>Qt::AlignCenter</set>
