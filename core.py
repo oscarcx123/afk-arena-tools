@@ -186,6 +186,19 @@ class Utils():
         cmd = f"adb shell input tap {x_coord} {y_coord}"
         self.exec_cmd(cmd)
 
+    # 滑动 / 长按
+    # 本函数仅用于debug
+    def swipe(self, fromX=None, fromY=None, toX=None, toY=None, swipe_time=200):
+        if toX is None and toY is None:
+            swipe_time = 500
+            self.write_log(f"长按坐标：{(fromX, fromY)}")
+            cmd = f"adb shell input swipe {fromX} {fromY} {fromX} {fromY} {swipe_time}"
+        else:
+            self.write_log(f"滑动：从{(fromX, fromY)}到{(toX, toY)}")
+            cmd = f"adb shell input swipe {fromX} {fromY} {toX} {toY} {swipe_time}"
+        
+        self.exec_cmd(cmd)
+    
     # 执行指令
     def exec_cmd(self, cmd, new_thread=False):
         if self.system == "Windows":
@@ -209,9 +222,13 @@ class Utils():
     def adb_connect(self):
         self.exec_cmd(f"adb connect {self.wifi_adb_addr}", new_thread=True)
 
-    # adb连接（USB）
-    def adb_connect_usb(self):
+    # adb devices（验证设备是否连接）
+    def adb_devices(self):
         self.exec_cmd("adb devices", new_thread=True)
+
+    # 查看adb版本
+    def adb_version(self):
+        self.exec_cmd("adb --version", new_thread=True)
 
     # 画点（测试用）
     def draw_circle(self):
@@ -287,6 +304,7 @@ class Command():
             "click_skip_battle_button": "self.exec_status = self.utils.match('skip_battle_button.png')",
             "click_bounty_board_button": "self.exec_status = self.utils.match('bounty_board_button.png')",
             "click_bounty_board_dispatch_all_button": "self.exec_status = self.utils.match('bounty_board_dispatch_all_button.png')",
+            "click_bounty_board_collect_all_button": "self.exec_status = self.utils.match('bounty_board_collect_all_button.png')",
             "click_bounty_board_confirm_button": "self.exec_status = self.utils.match('bounty_board_confirm_button.png')",
             "click_tower_button": "self.exec_status = self.utils.match('tower_button.png')",
             "click_tower_main_button": "self.exec_status = self.utils.match('tower_main_button.png')"
@@ -426,12 +444,12 @@ class Command():
         for mission in mission_list:
             func = "self." + mission + "()"
             exec(func)
-            if self.afk.kill_daily_mode:
+            if self.kill_daily_mode:
                 break
             time.sleep(2)
 
-        if self.afk.kill_daily_mode:
-            self.afk.kill_daily_mode = False
+        if self.kill_daily_mode:
+            self.kill_daily_mode = False
             self.utils.write_log("【日常任务】中断执行！")
         else:
             self.utils.write_log("【日常任务】全部完成！")
@@ -444,8 +462,8 @@ class Command():
             "click_battle_exit",
             "click_battle_pause",
             "click_battle",
-            "click_challenge_boss_fp",
             "check_boss_stage",
+            "click_challenge_boss_fp",            
             "check_bundle_pop_up",
             "check_level_up"
         ]
@@ -625,8 +643,8 @@ class Command():
             
             # 点击战斗
             cmd_list = [
-                "click_battle",
                 "click_skip_battle_button",
+                "click_battle"
             ]
             self.exec_func(cmd_list, exit_cond="afterExecFunc@click_skip_battle_button")
             time.sleep(2)
@@ -658,18 +676,14 @@ class Command():
     # 日常任务 - 接受3个悬赏任务（10pts）
     def daily_bounty_board(self):
         self.click_dark_forest_icon()
-        # 个人悬赏 - 一键派遣
+        # 个人悬赏 - 一键领取&派遣
         cmd_list = [
             "click_bounty_board_button",
+            "click_bounty_board_collect_all_button",
             "click_bounty_board_dispatch_all_button",
             "click_bounty_board_confirm_button"
         ]
         self.exec_func(cmd_list, exit_cond="afterExecFunc@click_bounty_board_confirm_button")
-        time.sleep(1)
-        
-        # 个人悬赏 - 一键领取
-        self.utils.current_match("bounty_board_collect_all_button.png")
-        self.utils.tap()
         time.sleep(1)
 
         # 切换到团队悬赏页面
@@ -677,17 +691,13 @@ class Command():
         self.utils.tap()
         time.sleep(1)
         
-        # 团队悬赏 - 一键派遣
+        # 团队悬赏 - 一键领取&派遣
         cmd_list = [
+            "click_bounty_board_collect_all_button",
             "click_bounty_board_dispatch_all_button",
             "click_bounty_board_confirm_button"
         ]
         self.exec_func(cmd_list, exit_cond="afterExecFunc@click_bounty_board_confirm_button")
-        time.sleep(1)
-        
-        # 团队悬赏 - 一键领取
-        self.utils.current_match("bounty_board_collect_all_button.png")
-        self.utils.tap()
         time.sleep(1)
 
         # 点击返回
@@ -866,6 +876,10 @@ class Command():
     def click_bounty_board_confirm_button(self):
         self.utils.tap()
 
+    # “悬赏栏”点击“一键领取”
+    def click_bounty_board_collect_all_button(self):
+        self.utils.tap()
+    
     # 点击“王座之塔”
     def click_tower_button(self):
         self.utils.tap()

@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>495</width>
-    <height>369</height>
+    <height>275</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -40,11 +40,11 @@
      <x>9</x>
      <y>48</y>
      <width>481</width>
-     <height>301</height>
+     <height>221</height>
     </rect>
    </property>
    <property name="text">
-    <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;这是关于AFK Arena游戏的一个辅助工具。&lt;/p&gt;&lt;p&gt;本工具并不涉及任何游戏内容的修改，仅仅是模拟人类进行一些比较花时间的操作，因此想着这是一个外挂的用户可以退散了。&lt;/p&gt;&lt;p&gt;本软件使用PyQt5制作，GUI设计使用了Qt Designer。&lt;/p&gt;&lt;p&gt;本软件的开源协议是BSD。&lt;/p&gt;&lt;p&gt;软件作者：oscarcx123&lt;/p&gt;&lt;p&gt;项目地址：&lt;a href=&quot;https://github.com/oscarcx123/fraction-calc&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#0057ae;&quot;&gt;https://github.com/oscarcx123/afk-arena-tools&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;&lt;p&gt;既然都看到这里了，不如给项目star一下呗～&lt;/p&gt;&lt;p&gt;&lt;br/&gt;&lt;/p&gt;&lt;p&gt;&lt;br/&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+    <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;这是关于AFK Arena游戏的一个辅助工具，不涉及任何游戏内容的修改。&lt;/p&gt;&lt;p&gt;目前程序已经完工，进入维护状态。&lt;/p&gt;&lt;p&gt;本软件使用PyQt5制作，GUI设计使用了Qt Designer。&lt;/p&gt;&lt;p&gt;本软件的开源协议是BSD。&lt;/p&gt;&lt;p&gt;软件作者：oscarcx123&lt;/p&gt;&lt;p&gt;项目地址：&lt;a href=&quot;https://github.com/oscarcx123/fraction-calc&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#0057ae;&quot;&gt;https://github.com/oscarcx123/afk-arena-tools&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;&lt;p&gt;既然都看到这里了，不如给项目star一下呗～&lt;br/&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
    </property>
    <property name="alignment">
     <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>

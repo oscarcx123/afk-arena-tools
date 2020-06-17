@@ -1,0 +1,1 @@
+python .\build_tools\gen_release.py

@@ -1,5 +1,6 @@
 .idea
 .vscode
 __pycache__
+dist
 screenshot.png
-unsorted_assets
+conf.json

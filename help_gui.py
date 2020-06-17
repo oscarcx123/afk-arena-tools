@@ -13,16 +13,16 @@ from PyQt5 import QtCore, QtGui, QtWidgets
 class Ui_Dialog(object):
     def setupUi(self, Dialog):
         Dialog.setObjectName("Dialog")
-        Dialog.resize(746, 454)
+        Dialog.resize(386, 226)
         self.label = QtWidgets.QLabel(Dialog)
-        self.label.setGeometry(QtCore.QRect(9, 9, 731, 33))
+        self.label.setGeometry(QtCore.QRect(9, 9, 361, 33))
         font = QtGui.QFont()
         font.setPointSize(16)
         self.label.setFont(font)
         self.label.setAlignment(QtCore.Qt.AlignCenter)
         self.label.setObjectName("label")
         self.label_2 = QtWidgets.QLabel(Dialog)
-        self.label_2.setGeometry(QtCore.QRect(9, 48, 731, 221))
+        self.label_2.setGeometry(QtCore.QRect(9, 48, 361, 161))
         self.label_2.setAlignment(QtCore.Qt.AlignLeading|QtCore.Qt.AlignLeft|QtCore.Qt.AlignVCenter)
         self.label_2.setWordWrap(True)
         self.label_2.setObjectName("label_2")
@@ -34,4 +34,4 @@ class Ui_Dialog(object):
         _translate = QtCore.QCoreApplication.translate
         Dialog.setWindowTitle(_translate("Dialog", "帮助"))
         self.label.setText(_translate("Dialog", "afk-arena-tools 帮助"))
-        self.label_2.setText(_translate("Dialog", "<html><head/><body><p>【正在施工中。。。。。。】</p><p>Q：软件如何使用？</p><p>A：直接点对应的按钮即可。</p><p>P.S. 本人是计算机业余爱好者，编程能力有限，出错在所难免，如果有问题可以去项目地址提issue，有能力修复的可以直接提Pull Request。</p><p>软件作者：oscarcx123</p><p>项目地址：<a href=\"https://github.com/oscarcx123/fraction-calc\"><span style=\" text-decoration: underline; color:#0057ae;\">https://github.com/oscarcx123/afk-arena-tools</span></a></p></body></html>"))
+        self.label_2.setText(_translate("Dialog", "<html><head/><body><p>有关程序的问题可以先看项目的readme，如果还是无法解决，可以开issue</p><p>目前程序已经完工，进入维护状态</p><p>软件作者：oscarcx123</p><p>项目地址：<a href=\"https://github.com/oscarcx123/fraction-calc\"><span style=\" text-decoration: underline; color:#0057ae;\">https://github.com/oscarcx123/afk-arena-tools</span></a></p></body></html>"))

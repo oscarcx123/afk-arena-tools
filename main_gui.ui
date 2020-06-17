@@ -318,7 +318,7 @@
       <widget class="QPushButton" name="pushButton_20">
        <property name="geometry">
         <rect>
-         <x>380</x>
+         <x>200</x>
          <y>20</y>
          <width>151</width>
          <height>40</height>
@@ -344,14 +344,14 @@
       <widget class="QPushButton" name="pushButton_10">
        <property name="geometry">
         <rect>
-         <x>200</x>
+         <x>380</x>
          <y>20</y>
          <width>151</width>
          <height>41</height>
         </rect>
        </property>
        <property name="text">
-        <string>没用</string>
+        <string>Placeholder</string>
        </property>
       </widget>
      </widget>
@@ -376,25 +376,12 @@
         <x>520</x>
         <y>10</y>
         <width>251</width>
-        <height>241</height>
+        <height>131</height>
        </rect>
       </property>
       <property name="title">
        <string>分辨率设置</string>
       </property>
-      <widget class="QCheckBox" name="checkBox">
-       <property name="geometry">
-        <rect>
-         <x>10</x>
-         <y>120</y>
-         <width>221</width>
-         <height>19</height>
-        </rect>
-       </property>
-       <property name="text">
-        <string>使用720/1080的比例</string>
-       </property>
-      </widget>
       <widget class="QRadioButton" name="radioButton">
        <property name="geometry">
         <rect>
@@ -484,8 +471,8 @@
       <widget class="QPushButton" name="pushButton_21">
        <property name="geometry">
         <rect>
-         <x>10</x>
-         <y>80</y>
+         <x>520</x>
+         <y>30</y>
          <width>221</width>
          <height>40</height>
         </rect>
@@ -497,8 +484,8 @@
       <widget class="QPushButton" name="pushButton_22">
        <property name="geometry">
         <rect>
-         <x>10</x>
-         <y>180</y>
+         <x>20</x>
+         <y>130</y>
          <width>221</width>
          <height>40</height>
         </rect>
@@ -510,44 +497,31 @@
       <widget class="QPushButton" name="pushButton_23">
        <property name="geometry">
         <rect>
-         <x>10</x>
-         <y>130</y>
+         <x>20</x>
+         <y>80</y>
          <width>221</width>
          <height>40</height>
         </rect>
        </property>
        <property name="text">
-        <string>运行adb devices</string>
+        <string>查看设备</string>
        </property>
       </widget>
       <widget class="QLineEdit" name="lineEdit">
        <property name="geometry">
         <rect>
-         <x>10</x>
+         <x>320</x>
          <y>30</y>
-         <width>161</width>
+         <width>171</width>
          <height>40</height>
         </rect>
-       </property>
-      </widget>
-      <widget class="QPushButton" name="pushButton_29">
-       <property name="geometry">
-        <rect>
-         <x>180</x>
-         <y>30</y>
-         <width>51</width>
-         <height>40</height>
-        </rect>
-       </property>
-       <property name="text">
-        <string>保存</string>
        </property>
       </widget>
       <widget class="QPushButton" name="pushButton_25">
        <property name="geometry">
         <rect>
-         <x>260</x>
-         <y>30</y>
+         <x>20</x>
+         <y>180</y>
          <width>221</width>
          <height>40</height>
         </rect>
@@ -559,40 +533,267 @@
       <widget class="QPushButton" name="pushButton_26">
        <property name="geometry">
         <rect>
-         <x>260</x>
-         <y>80</y>
-         <width>221</width>
-         <height>40</height>
-        </rect>
-       </property>
-       <property name="text">
-        <string>PushButton</string>
-       </property>
-      </widget>
-      <widget class="QPushButton" name="pushButton_27">
-       <property name="geometry">
-        <rect>
-         <x>260</x>
-         <y>130</y>
-         <width>221</width>
-         <height>40</height>
-        </rect>
-       </property>
-       <property name="text">
-        <string>PushButton</string>
-       </property>
-      </widget>
-      <widget class="QPushButton" name="pushButton_28">
-       <property name="geometry">
-        <rect>
-         <x>260</x>
+         <x>520</x>
          <y>180</y>
          <width>221</width>
          <height>40</height>
         </rect>
        </property>
        <property name="text">
-        <string>PushButton</string>
+        <string>滑动</string>
+       </property>
+      </widget>
+      <widget class="QPushButton" name="pushButton_27">
+       <property name="geometry">
+        <rect>
+         <x>520</x>
+         <y>80</y>
+         <width>221</width>
+         <height>40</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>点击</string>
+       </property>
+      </widget>
+      <widget class="QPushButton" name="pushButton_28">
+       <property name="geometry">
+        <rect>
+         <x>520</x>
+         <y>130</y>
+         <width>221</width>
+         <height>40</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>长按</string>
+       </property>
+      </widget>
+      <widget class="QLabel" name="label_3">
+       <property name="geometry">
+        <rect>
+         <x>260</x>
+         <y>30</y>
+         <width>51</width>
+         <height>40</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>IP地址</string>
+       </property>
+       <property name="alignment">
+        <set>Qt::AlignCenter</set>
+       </property>
+      </widget>
+      <widget class="QPushButton" name="pushButton_24">
+       <property name="geometry">
+        <rect>
+         <x>20</x>
+         <y>30</y>
+         <width>221</width>
+         <height>40</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>查看adb版本</string>
+       </property>
+      </widget>
+      <widget class="QLabel" name="label_4">
+       <property name="geometry">
+        <rect>
+         <x>260</x>
+         <y>80</y>
+         <width>51</width>
+         <height>40</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>X</string>
+       </property>
+       <property name="alignment">
+        <set>Qt::AlignCenter</set>
+       </property>
+      </widget>
+      <widget class="QLineEdit" name="lineEdit_2">
+       <property name="geometry">
+        <rect>
+         <x>320</x>
+         <y>80</y>
+         <width>61</width>
+         <height>40</height>
+        </rect>
+       </property>
+      </widget>
+      <widget class="QLabel" name="label_5">
+       <property name="geometry">
+        <rect>
+         <x>380</x>
+         <y>80</y>
+         <width>51</width>
+         <height>40</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>Y</string>
+       </property>
+       <property name="alignment">
+        <set>Qt::AlignCenter</set>
+       </property>
+      </widget>
+      <widget class="QLineEdit" name="lineEdit_3">
+       <property name="geometry">
+        <rect>
+         <x>430</x>
+         <y>80</y>
+         <width>61</width>
+         <height>40</height>
+        </rect>
+       </property>
+      </widget>
+      <widget class="QLabel" name="label_6">
+       <property name="geometry">
+        <rect>
+         <x>380</x>
+         <y>130</y>
+         <width>51</width>
+         <height>40</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>FromY</string>
+       </property>
+       <property name="alignment">
+        <set>Qt::AlignCenter</set>
+       </property>
+      </widget>
+      <widget class="QLabel" name="label_7">
+       <property name="geometry">
+        <rect>
+         <x>260</x>
+         <y>130</y>
+         <width>51</width>
+         <height>40</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>FromX</string>
+       </property>
+       <property name="alignment">
+        <set>Qt::AlignCenter</set>
+       </property>
+      </widget>
+      <widget class="QLineEdit" name="lineEdit_4">
+       <property name="geometry">
+        <rect>
+         <x>320</x>
+         <y>130</y>
+         <width>61</width>
+         <height>40</height>
+        </rect>
+       </property>
+      </widget>
+      <widget class="QLineEdit" name="lineEdit_5">
+       <property name="geometry">
+        <rect>
+         <x>430</x>
+         <y>130</y>
+         <width>61</width>
+         <height>40</height>
+        </rect>
+       </property>
+      </widget>
+      <widget class="QLabel" name="label_8">
+       <property name="geometry">
+        <rect>
+         <x>380</x>
+         <y>180</y>
+         <width>51</width>
+         <height>40</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>ToY</string>
+       </property>
+       <property name="alignment">
+        <set>Qt::AlignCenter</set>
+       </property>
+      </widget>
+      <widget class="QLabel" name="label_9">
+       <property name="geometry">
+        <rect>
+         <x>260</x>
+         <y>180</y>
+         <width>51</width>
+         <height>40</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>ToX</string>
+       </property>
+       <property name="alignment">
+        <set>Qt::AlignCenter</set>
+       </property>
+      </widget>
+      <widget class="QLineEdit" name="lineEdit_6">
+       <property name="geometry">
+        <rect>
+         <x>320</x>
+         <y>180</y>
+         <width>61</width>
+         <height>40</height>
+        </rect>
+       </property>
+      </widget>
+      <widget class="QLineEdit" name="lineEdit_7">
+       <property name="geometry">
+        <rect>
+         <x>430</x>
+         <y>180</y>
+         <width>61</width>
+         <height>40</height>
+        </rect>
+       </property>
+      </widget>
+     </widget>
+     <widget class="QGroupBox" name="groupBox_8">
+      <property name="geometry">
+       <rect>
+        <x>520</x>
+        <y>149</y>
+        <width>251</width>
+        <height>101</height>
+       </rect>
+      </property>
+      <property name="title">
+       <string>不推荐使用（Deprecated）</string>
+      </property>
+      <widget class="QCheckBox" name="checkBox">
+       <property name="geometry">
+        <rect>
+         <x>10</x>
+         <y>30</y>
+         <width>221</width>
+         <height>19</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>使用720/1080的比例</string>
+       </property>
+      </widget>
+      <widget class="QLabel" name="label_2">
+       <property name="geometry">
+        <rect>
+         <x>10</x>
+         <y>50</y>
+         <width>231</width>
+         <height>51</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;用于解决手机显示/触控分辨率不同，如果以后重构，会移除此项&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+       </property>
+       <property name="wordWrap">
+        <bool>true</bool>
        </property>
       </widget>
      </widget>
