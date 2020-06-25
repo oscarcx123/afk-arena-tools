@@ -1,22 +1,15 @@
 import os
-import shutil
 import zipfile
 
 # 版本号
-version_str = "V1.1.0"
-
-# 复制一个pyw格式
-shutil.copyfile("main.py", "main.pyw")
+version_str = "V1.1.1"
 
 # 核心文件清单，这些文件进入所有平台的包
 core_file_list = [
-    'about_gui.py',
     'core.py',
-    'help_gui.py',
     'img',
     'LICENSE',
     'main.py',
-    'main.pyw',
     'main_gui.py',
     'README.md'
 ]

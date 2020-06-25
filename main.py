@@ -10,9 +10,6 @@ from PyQt5.QtCore import pyqtSignal
 from core import Utils, Command
 
 import main_gui
-import about_gui
-import help_gui
-
 
 '''
 【主窗口类】
@@ -21,27 +18,26 @@ import help_gui
 '''
 class MainWin(QMainWindow):
     def __init__(self, parent=None):
+        # pyqt必要的代码
         self.app = QApplication(sys.argv)
         QMainWindow.__init__(self, parent)
         self.ui = main_gui.Ui_MainWindow()
         self.ui.setupUi(self)
-        self.init_core()
-        self.init_other()
-        self.init_subwindow()
+        # 程序功能模块（core.py）初始化
+        self.afk = Command()
+        # 让功能模块（core.py）也能访问UI
+        self.afk.utils.ui = self.ui
+        # 图形界面数值的初始化
         self.init_interface()
+        # 信号初始化
         self.init_signal()
         self.write_log("初始化完成！")
         self.write_log("afk-arena-tools是开源软件，如果有任何问题建议想法，欢迎提issue或PR~")
+        # pyqt必要的代码
         self.show()
         sys.exit(self.app.exec_())
 
 
-    # 子窗口初始化（在这里创建实例，从而规避子窗口多开问题）
-    def init_subwindow(self):
-        self.about_window = About()
-        self.help_window = Help()
-
-    
     # 图形界面数值的初始化
     def init_interface(self):
         # 当前正在执行的功能
@@ -55,14 +51,13 @@ class MainWin(QMainWindow):
     # 信号和槽（绑定事件）初始化
     def init_signal(self):
         # 绑定“生成器”页面的“生成”按钮到generate函数
-        self.ui.action.triggered.connect(self.help_window.show_window)
-        self.ui.action_2.triggered.connect(self.about_window.show_window)
         self.ui.pushButton.clicked.connect(partial(self.do_func, self.afk.story_mode_retry_only))
         self.ui.pushButton_2.clicked.connect(partial(self.do_func, self.afk.story_mode))
         self.ui.pushButton_5.clicked.connect(partial(self.do_func, self.afk.tower_mode_retry_only))
         self.ui.pushButton_6.clicked.connect(partial(self.do_func, self.afk.tower_mode))
+        self.ui.pushButton_10.clicked.connect(self.get_thread_status)
         self.ui.pushButton_20.clicked.connect(self.stop_thread)
-        self.ui.pushButton_21.clicked.connect(self.get_new_wifi_adb_addr)
+        self.ui.pushButton_21.clicked.connect(self.wifi_adb_connect)
         self.ui.pushButton_22.clicked.connect(partial(self.afk.utils.get_img, pop_up_window=True))
         self.ui.pushButton_23.clicked.connect(self.afk.utils.adb_devices)
         self.ui.pushButton_24.clicked.connect(self.afk.utils.adb_version)
@@ -71,12 +66,14 @@ class MainWin(QMainWindow):
         self.ui.pushButton_27.clicked.connect(self.gui_tap)
         self.ui.pushButton_28.clicked.connect(self.gui_long_press)
         self.ui.pushButton_9.clicked.connect(partial(self.do_func, self.afk.daily_mode))
-        self.ui.checkBox.clicked.connect(self.check_ratio)
         self.ui.radioButton.clicked.connect(partial(self.change_resolution, 100))
         self.ui.radioButton_2.clicked.connect(partial(self.change_resolution, 75))
         self.ui.radioButton_3.clicked.connect(partial(self.change_resolution, 50))
         self.afk.utils.logger.update_signal.connect(self.write_log)
         self.afk.utils.logger.error_stop_signal.connect(self.stop_thread)
+        self.afk.utils.logger.finish_exec_signal.connect(self.thread_finish_exec)
+        self.ui.doubleSpinBox.valueChanged.connect(self.change_exec_time_delay)
+        self.ui.doubleSpinBox_2.valueChanged.connect(self.change_threshold)
         
     # 加载默认配置
     def load_default_conf(self):
@@ -97,6 +94,9 @@ class MainWin(QMainWindow):
         self.ui.checkBox_11.setCheckable(False)
         self.ui.checkBox_12.setCheckable(False)
         self.ui.checkBox_13.setCheckable(False)
+        # 脚本执行设置
+        self.ui.doubleSpinBox.setValue(1.00)
+        self.ui.doubleSpinBox_2.setValue(0.90)
 
     # 保存配置
     def save_conf(self):
@@ -117,6 +117,8 @@ class MainWin(QMainWindow):
         conf_data["checkBox_11"] = self.ui.checkBox_11.isCheckable()
         conf_data["checkBox_12"] = self.ui.checkBox_12.isCheckable()
         conf_data["checkBox_13"] = self.ui.checkBox_13.isCheckable()
+        conf_data["doubleSpinBox"] = self.afk.exec_func_delay
+        conf_data["doubleSpinBox_2"] = self.afk.utils.threshold
         with open(os.path.join(os.getcwd(), "conf.json"), "w") as f:
             json.dump(conf_data, f)
 
@@ -126,58 +128,67 @@ class MainWin(QMainWindow):
         if os.path.isfile(full_path):
             with open(full_path) as f:
                 conf_data = json.load(f)
-            self.afk.utils.wifi_adb_addr = conf_data["wifi_adb_addr"]
-            self.ui.lineEdit.setText(self.afk.utils.wifi_adb_addr)
-            self.ui.radioButton.setChecked(conf_data["radioButton"])
-            self.ui.radioButton_2.setChecked(conf_data["radioButton_2"])
-            self.ui.radioButton_3.setChecked(conf_data["radioButton_3"])
-            # 日常任务默认勾选
-            self.ui.checkBox_2.setChecked(conf_data["checkBox_2"])
-            self.ui.checkBox_3.setChecked(conf_data["checkBox_3"])
-            self.ui.checkBox_4.setChecked(conf_data["checkBox_4"])
-            self.ui.checkBox_5.setChecked(conf_data["checkBox_5"])
-            self.ui.checkBox_6.setChecked(conf_data["checkBox_6"])
-            self.ui.checkBox_7.setChecked(conf_data["checkBox_7"])
-            self.ui.checkBox_8.setChecked(conf_data["checkBox_8"])
-            self.ui.checkBox_9.setChecked(conf_data["checkBox_9"])
-            self.ui.checkBox_10.setChecked(conf_data["checkBox_10"])
-            self.ui.checkBox_11.setCheckable(conf_data["checkBox_11"])
-            self.ui.checkBox_12.setCheckable(conf_data["checkBox_12"])
-            self.ui.checkBox_13.setCheckable(conf_data["checkBox_13"])
+            try:
+                self.afk.utils.wifi_adb_addr = conf_data["wifi_adb_addr"]
+                self.ui.lineEdit.setText(self.afk.utils.wifi_adb_addr)
+                self.ui.radioButton.setChecked(conf_data["radioButton"])
+                if conf_data["radioButton"]:
+                    self.change_resolution(100, show_log=False)
+                self.ui.radioButton_2.setChecked(conf_data["radioButton_2"])
+                if conf_data["radioButton_2"]:
+                    self.change_resolution(75, show_log=False)
+                self.ui.radioButton_3.setChecked(conf_data["radioButton_3"])
+                if conf_data["radioButton_3"]:
+                    self.change_resolution(50, show_log=False)
+                # 日常任务默认勾选
+                self.ui.checkBox_2.setChecked(conf_data["checkBox_2"])
+                self.ui.checkBox_3.setChecked(conf_data["checkBox_3"])
+                self.ui.checkBox_4.setChecked(conf_data["checkBox_4"])
+                self.ui.checkBox_5.setChecked(conf_data["checkBox_5"])
+                self.ui.checkBox_6.setChecked(conf_data["checkBox_6"])
+                self.ui.checkBox_7.setChecked(conf_data["checkBox_7"])
+                self.ui.checkBox_8.setChecked(conf_data["checkBox_8"])
+                self.ui.checkBox_9.setChecked(conf_data["checkBox_9"])
+                self.ui.checkBox_10.setChecked(conf_data["checkBox_10"])
+                self.ui.checkBox_11.setCheckable(conf_data["checkBox_11"])
+                self.ui.checkBox_12.setCheckable(conf_data["checkBox_12"])
+                self.ui.checkBox_13.setCheckable(conf_data["checkBox_13"])
+                self.afk.exec_func_delay = float(conf_data["doubleSpinBox"])
+                self.ui.doubleSpinBox.setValue(self.afk.exec_func_delay)
+                self.afk.utils.threshold = float(conf_data["doubleSpinBox_2"])
+                self.ui.doubleSpinBox_2.setValue(self.afk.utils.threshold)
+            except:
+                self.write_log("配置读取错误，加载默认配置并生成配置文件conf.json")
+                self.load_default_conf()
+                self.save_conf()
         else:
             self.write_log("检测到是首次启动，加载默认配置并生成配置文件conf.json")
             self.load_default_conf()
             self.save_conf()
-
-
-    # 程序核心（core）代码初始化
-    def init_core(self):
-        self.afk = Command()
-        
-    # 初始化其余内容
-    def init_other(self):
-        self.afk.utils.ui = self.ui
-
+  
 
     # 执行功能
     def do_func(self, func):
         if not self.curr_func:
+            self.afk.stop = False
             self.save_conf()
             self.curr_func = Thread(target=func)
             self.curr_func.start()
 
     # 杀掉线程
     def stop_thread(self):
+        self.afk.utils.stop_callback = True
         if self.curr_func:
             self.afk.stop = True
             self.curr_func = None
-            self.write_log("成功停止当前执行的功能！")
-            self.afk.utils.stop_callback = True
-            if self.afk.is_daily_mode:
-                self.afk.kill_daily_mode = True
+            self.write_log("成功停止当前执行的功能！如果还在继续，说明还有残余指令在运行，可以等待执行完毕或者直接重启软件")  
         else:
             self.write_log("当前没有正在执行的功能！")
 
+    # 线程正常执行完毕
+    def thread_finish_exec(self):
+        self.curr_func = None
+    
     # 在GUI窗口的log框中输出日志
     def write_log(self, text=None):
         #print(self.afk.utils.text)
@@ -191,73 +202,46 @@ class MainWin(QMainWindow):
             self.ui.textBrowser.insertPlainText(f"[{curr_time}]{text}\n")
             self.ui.textBrowser.ensureCursorVisible()
 
-    # 更改截图与实际坐的比例
-    # 例如：手机截图是1080P但是点击坐标系是720P，就勾选这个
-    def check_ratio(self):
-        if self.ui.checkBox.isChecked():
-            self.afk.utils.ratio = 720 / 1080
-            self.write_log("成功将比例调整为“720/1080”")
-        else:
-            self.afk.utils.ratio = 1
-            self.write_log("成功将比例调整为1")
 
     # 更改分辨率
-    def change_resolution(self, percentage):
+    def change_resolution(self, percentage, show_log=True):
         self.afk.utils.scale_percentage = percentage
         self.afk.utils.load_res()
-        self.write_log(f"成功将分辨率更改为{int(1440 * percentage / 100)}P")
+        if show_log:
+            self.write_log(f"成功将分辨率更改为{int(1440 * percentage / 100)}P")
 
     # 写入新的wifi_adb地址并连接
-    def get_new_wifi_adb_addr(self):
+    def wifi_adb_connect(self):
         self.afk.utils.wifi_adb_addr = self.ui.lineEdit.text()
         self.write_log("保存wifi_adb地址成功！")
         self.afk.utils.adb_connect()
 
     # 通过GUI点击
     def gui_tap(self):
-        self.afk.utils.tap(x_coord=self.ui.lineEdit_2.text(), y_coord=self.ui.lineEdit_3.text(), randomize=False)
+        self.afk.utils.tap(x_coord=int(self.ui.lineEdit_2.text()), y_coord=int(self.ui.lineEdit_3.text()), randomize=False)
 
     # 通过GUI长按
     def gui_long_press(self):
-        self.afk.utils.swipe(fromX=self.ui.lineEdit_4.text(), fromY=self.ui.lineEdit_5.text())
+        self.afk.utils.swipe(fromX=int(self.ui.lineEdit_4.text()), fromY=int(self.ui.lineEdit_5.text()))
 
     # 通过GUI滑动
     def gui_swipe(self):
-        self.afk.utils.swipe(fromX=self.ui.lineEdit_4.text(), fromY=self.ui.lineEdit_5.text(), toX=self.ui.lineEdit_6.text(), toY=self.ui.lineEdit_7.text())
+        self.afk.utils.swipe(fromX=int(self.ui.lineEdit_4.text()), fromY=int(self.ui.lineEdit_5.text()), toX=int(self.ui.lineEdit_6.text()), toY=int(self.ui.lineEdit_7.text()))
 
-'''
-【子窗口基类】
-需要继承并复写ui_init函数才能使用。
-使用时需要在MainWin类的init_subwindow函数中注册。
-每次显示窗口就只调用show方法而不是重新实例化，这样可以防止子窗口多开。
-'''
-class SubWin(QMainWindow):
-    def __init__(self, parent=None):
-        QMainWindow.__init__(self, parent)
-        self.ui_init()
-        self.ui.setupUi(self)
+    # 获得当前执行状态
+    def get_thread_status(self):
+        if self.curr_func:
+            self.write_log(f"【运行状态】正在执行，线程名称：{self.curr_func.name}")
+        else:
+            self.write_log(f"【运行状态】没在执行")
 
-    # 此函数留白，用于在继承子窗口基类时复写
-    # 复写格式为 self.ui = gui_file.ui_type()
-    # 例子：self.ui = about_gui.Ui_Dialog()
-    def ui_init(self):
-        pass
+    # exec_time延迟设置
+    def change_exec_time_delay(self):
+        self.afk.exec_func_delay = self.ui.doubleSpinBox.value()
 
-    # 显示窗口
-    def show_window(self):
-        self.show()
-        self.raise_()
-
-# “关于”窗口
-class About(SubWin):
-    def ui_init(self):
-        self.ui = about_gui.Ui_Dialog()
-
-
-# “使用帮助”窗口
-class Help(SubWin):
-    def ui_init(self):
-        self.ui = help_gui.Ui_Dialog()
+    # 图片匹配阈值设置
+    def change_threshold(self):
+        self.afk.utils.threshold = self.ui.doubleSpinBox_2.value()
 
 if __name__ == '__main__':
     window = MainWin()

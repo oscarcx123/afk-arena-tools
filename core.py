@@ -2,11 +2,10 @@ import os
 import cv2
 import time
 import random
-import platform
+import traceback
 import subprocess
 import numpy as np
-from threading import Thread
-
+import concurrent.futures
 from PyQt5.QtCore import QObject, pyqtSignal
 
 # QWidget无法在主线程之外被调用，因此构造一个QObject，使用自定义的信号来触发主线程的槽函数
@@ -18,6 +17,8 @@ class UpdateLog(QObject):
     update_signal = pyqtSignal()
     # 程序出错停止当前执行任务信号
     error_stop_signal = pyqtSignal()
+    # 程序执行完成信号
+    finish_exec_signal = pyqtSignal()
  
     def __init__(self):
         QObject.__init__(self)
@@ -28,15 +29,15 @@ class UpdateLog(QObject):
     def error_stop(self):
         self.error_stop_signal.emit()
 
+    def finish_exec(self):
+        self.finish_exec_signal.emit()
+
 class Utils():
     def __init__(self):
         # debug开关（开启后，成功匹配会弹出图片，上面用圈标明了匹配到的坐标点范围）
         self.debug = False
         # 计数
         self.cnt = 0
-        # 一般无需调整比例（默认为1），但是手机魔改之后如果点不到，可以尝试修改这个
-        # 例如我的旧手机分辨率从1080p降低到了720p，需要调整比例
-        self.ratio = 1
         # 分辨率相关
         self.screen_height = 2560
         self.screen_width = 1440
@@ -44,18 +45,15 @@ class Utils():
         # log临时堆栈，输出后会pop掉
         self.text = []
         # 图像匹配阈值
-        self.threshold = 0.93
-        
-        # 加载图像资源
-        self.load_res()
-        # log转发
-        self.logger = UpdateLog()
+        self.threshold = 0.90
         # 停止操作回调
         self.stop_callback = False
-        # 系统平台
-        self.system = platform.system()
         # wifi_adb默认地址
         self.wifi_adb_addr = "192.168.1.239:5555"
+        # log转发
+        self.logger = UpdateLog()
+        # 加载图像资源
+        self.load_res()
 
     # 加载图像资源
     def load_res(self):
@@ -78,8 +76,7 @@ class Utils():
 
     # 获取截图
     def get_img(self, pop_up_window=False, save_img=False):
-        pipe = subprocess.Popen("adb exec-out screencap -p", stdin=subprocess.PIPE, stdout=subprocess.PIPE, shell=True)
-        image_bytes = pipe.stdout.read()
+        image_bytes = self.exec_cmd("adb exec-out screencap -p")
 
         if image_bytes == b'':
             self.write_log(f"截图失败！请检查adb是否已经跟手机连接！")
@@ -113,7 +110,7 @@ class Utils():
         except:
             self.write_log(f"OpenCV对比失败！请使用杂项中的截图功能来测试能否正常截图！")
             self.error_stop()
-        print(f"{img_name}最大匹配度：{max_val}")
+        # print(f"{img_name}最大匹配度：{max_val}")
         if max_val < self.threshold:
             return False
         
@@ -123,6 +120,7 @@ class Utils():
         self.pointCentre = (int(max_loc[0] + (find_width / 2)), int(max_loc[1] + (find_height / 2)))
         if self.debug:
             self.draw_circle()
+        self.write_log(f"匹配到{img_name}，匹配度：{max_val}")
         return True
 
     # 匹配多个结果
@@ -178,8 +176,8 @@ class Utils():
         if x_coord is None and y_coord is None:
             x_coord, y_coord = self.get_coord(randomize=randomize)
         if percentage:
-            x_coord = int(x_coord * self.screen_width * (self.scale_percentage / 100) * self.ratio)
-            y_coord = int(y_coord * self.screen_height * (self.scale_percentage / 100) * self.ratio)
+            x_coord = int(x_coord * self.screen_width * (self.scale_percentage / 100))
+            y_coord = int(y_coord * self.screen_height * (self.scale_percentage / 100))
             x_coord = self.randomize_coord(x_coord, 5)
             y_coord = self.randomize_coord(y_coord, 5)
         self.write_log(f"点击坐标：{(x_coord, y_coord)}")
@@ -195,24 +193,28 @@ class Utils():
             cmd = f"adb shell input swipe {fromX} {fromY} {fromX} {fromY} {swipe_time}"
         else:
             self.write_log(f"滑动：从{(fromX, fromY)}到{(toX, toY)}")
-            cmd = f"adb shell input swipe {fromX} {fromY} {toX} {toY} {swipe_time}"
-        
+            cmd = f"adb shell input swipe {fromX} {fromY} {toX} {toY} {swipe_time}"       
         self.exec_cmd(cmd)
     
     # 执行指令
-    def exec_cmd(self, cmd, new_thread=False):
-        if self.system == "Windows":
-            cmd = cmd.replace("adb", "adb.exe")
+    def exec_cmd(self, cmd, new_thread=False, show_output=False):
+        def do_cmd(cmd):
+            pipe = subprocess.Popen(cmd, stdin=subprocess.PIPE, stdout=subprocess.PIPE, shell=True)
+            return pipe.stdout.read()
+                   
         if new_thread:
-            t = Thread(target=self.thread_exec_cmd, args=[cmd])
-            t.start()
+            if show_output:
+                self.write_log(f"执行{cmd}")
+            with concurrent.futures.ThreadPoolExecutor() as executor:
+                future = executor.submit(do_cmd, cmd)
+                ret_val = future.result()
         else:
-            os.system(cmd)
-
-    # 子线程执行指令（防止阻塞）
-    def thread_exec_cmd(self, cmd):
-        os.system(cmd)
-        self.write_log(f"{cmd}执行完毕")
+            if show_output:
+                self.write_log(f"执行{cmd}")
+            ret_val = do_cmd(cmd)
+        if show_output:
+            self.write_log(ret_val.decode("utf-8"))
+        return ret_val
 
     # 控制台显示执行次数
     def show_cnt(self):
@@ -220,15 +222,15 @@ class Utils():
 
     # adb连接（WIFI）
     def adb_connect(self):
-        self.exec_cmd(f"adb connect {self.wifi_adb_addr}", new_thread=True)
+        self.exec_cmd(f"adb connect {self.wifi_adb_addr}", new_thread=True, show_output=True)
 
     # adb devices（验证设备是否连接）
     def adb_devices(self):
-        self.exec_cmd("adb devices", new_thread=True)
+        self.exec_cmd("adb devices", new_thread=True, show_output=True)
 
     # 查看adb版本
     def adb_version(self):
-        self.exec_cmd("adb --version", new_thread=True)
+        self.exec_cmd("adb --version", new_thread=True, show_output=True)
 
     # 画点（测试用）
     def draw_circle(self):
@@ -239,8 +241,8 @@ class Utils():
 
     # 获取匹配到的坐标
     def get_coord(self, randomize=True):
-        x_coord = int(self.pointCentre[0] * self.ratio)
-        y_coord = int(self.pointCentre[1] * self.ratio)
+        x_coord = self.pointCentre[0]
+        y_coord = self.pointCentre[1]
         if randomize:
             x_coord = self.randomize_coord(x_coord, 20)
             y_coord = self.randomize_coord(y_coord, 15)
@@ -261,6 +263,7 @@ class Utils():
 
     # 致命错误时转发到GUI实现停止当前任务
     def error_stop(self):
+        self.stop_callback = False
         self.logger.error_stop()
         # 等待GUI线程的回调，确保当前任务已经停止
         while True:
@@ -274,96 +277,98 @@ class Command():
     def __init__(self):
         self.utils = Utils()
         # 指令与执行操作的对应关系
-        self.func = {
-            "click_battle_retry": "self.exec_status = self.utils.match('after_battle_retry_button.png')",
-            "click_next_stage": "self.exec_status = self.utils.match('next_stage_button.png')",
-            "click_continue": "self.exec_status = self.utils.match('continue_button.png')",
-            "click_battle": "self.exec_status = self.utils.match('battle_button.png')",
-            "click_battle_pause": "self.exec_status = self.utils.match('in_battle_pause_button.png')",
-            "click_battle_exit": "self.exec_status = self.utils.match('in_battle_exit_button.png')",
-            "click_challenge": "self.exec_status = self.utils.match('challenge_button.png')",
-            "check_boss_stage": "self.exec_status = self.utils.match('challenge_boss_button.png')",
-            "check_bundle_pop_up": "self.exec_status = self.utils.match('bundle_pop_up.png')",
-            "click_challenge_boss_fp": "self.exec_status = self.utils.match('challenge_boss_fp_button.png')",
-            "check_level_up": "self.exec_status = self.utils.match('level_up.png')",
-            "click_idle_chest": "self.exec_status = self.utils.match('idle_chest.png')",
-            "click_friend_button": "self.exec_status = self.utils.match('friend_button.png')",
-            "click_expand_left_col_button": "self.exec_status = self.utils.match('expand_left_col_button.png')",
-            "click_send_heart_button": "self.exec_status = self.utils.match('send_heart_button.png')",
-            "click_close_friend_ui_button": "self.exec_status = self.utils.match('ui_return_button.png')",
-            "click_instant_idle_button": "self.exec_status = self.utils.match('instant_idle_button.png')",
-            "click_instant_idle_free_claim_button": "self.exec_status = self.utils.match('instant_idle_free_claim_button.png')",
-            "click_instant_idle_close_button": "self.exec_status = self.utils.match('instant_idle_close_button.png')",
-            "click_noble_tavern_button": "self.exec_status = self.utils.match('noble_tavern_button.png')",
-            "click_friend_summon_pool": "self.exec_status = self.utils.match('friend_summon_pool.png')",
-            "click_guild_button": "self.exec_status = self.utils.match('guild_button.png')",
-            "click_guild_boss_button": "self.exec_status = self.utils.match('guild_boss_button.png')",
-            "click_arena_button": "self.exec_status = self.utils.match('arena_button.png')",
-            "click_normal_arena_button": "self.exec_status = self.utils.match('normal_arena_button.png')",
-            "click_arena_challenge_button": "self.exec_status = self.utils.match('arena_challenge_button.png')",
-            "click_skip_battle_button": "self.exec_status = self.utils.match('skip_battle_button.png')",
-            "click_bounty_board_button": "self.exec_status = self.utils.match('bounty_board_button.png')",
-            "click_bounty_board_dispatch_all_button": "self.exec_status = self.utils.match('bounty_board_dispatch_all_button.png')",
-            "click_bounty_board_collect_all_button": "self.exec_status = self.utils.match('bounty_board_collect_all_button.png')",
-            "click_bounty_board_confirm_button": "self.exec_status = self.utils.match('bounty_board_confirm_button.png')",
-            "click_tower_button": "self.exec_status = self.utils.match('tower_button.png')",
-            "click_tower_main_button": "self.exec_status = self.utils.match('tower_main_button.png')"
+        self.func_to_img = {
+            "click_battle_retry": ["after_battle_retry_button.png", "have_func"], 
+            "click_next_stage": ["next_stage_button.png", "have_func"], 
+            "click_continue": ["continue_button.png", "have_func"], 
+            "click_battle": ["battle_button.png"], 
+            "click_battle_pause": ["in_battle_pause_button.png"], 
+            "click_battle_exit": ["in_battle_exit_button.png"], 
+            "click_challenge": ["challenge_button.png"], 
+            "check_boss_stage": ["challenge_boss_button.png"], 
+            "check_bundle_pop_up": ["bundle_pop_up.png", "have_func"], 
+            "click_challenge_boss_fp": ["challenge_boss_fp_button.png"], 
+            "check_level_up": ["level_up.png", "have_func"], 
+            "click_idle_chest": ["idle_chest.png"], 
+            "click_friend_button": ["friend_button.png"], 
+            "click_expand_left_col_button": ["expand_left_col_button.png", "have_func"], 
+            "click_send_heart_button": ["send_heart_button.png"], 
+            "click_close_friend_ui_button": ["ui_return_button.png"], 
+            "click_instant_idle_button": ["instant_idle_button.png"], 
+            "click_instant_idle_free_claim_button": ["instant_idle_free_claim_button.png"], 
+            "click_instant_idle_close_button": ["instant_idle_close_button.png"], 
+            "click_noble_tavern_button": ["noble_tavern_button.png"], 
+            "click_friend_summon_pool": ["friend_summon_pool.png"], 
+            "click_guild_button": ["guild_button.png"], 
+            "click_guild_boss_button": ["guild_boss_button.png"], 
+            "click_arena_button": ["arena_button.png"], 
+            "click_normal_arena_button": ["normal_arena_button.png"], 
+            "click_arena_challenge_button": ["arena_challenge_button.png"], 
+            "click_skip_battle_button": ["skip_battle_button.png"], 
+            "click_bounty_board_button": ["bounty_board_button.png"], 
+            "click_bounty_board_dispatch_all_button": ["bounty_board_dispatch_all_button.png"], 
+            "click_bounty_board_collect_all_button": ["bounty_board_collect_all_button.png"], 
+            "click_bounty_board_confirm_button": ["bounty_board_confirm_button.png"], 
+            "click_tower_button": ["tower_button.png"], 
+            "click_tower_main_button": ["tower_main_button.png"]
         }
-        # 是否执行指令
-        self.exec_status = None
         # 是否杀掉进程
         self.stop = False
         # 以下坐标会在执行“日常任务”模式时自动初始化
-        # “领地”点击坐标
+        # “领地”、“野外”、“战役”点击坐标
         self.ranhorn_coord = None
-        # “野外”点击坐标
         self.dark_forest_coord = None
-        # “战役”点击坐标
         self.campaign_coord = None
-        # 是否在执行日常模式
-        self.is_daily_mode = False
-        # 是否停止执行日常模式
-        self.kill_daily_mode = False
+        # exec_func函数默认延迟一秒（延迟太短会导致截图太快，从而反复多点几次）
+        self.exec_func_delay = 1
 
     # 自动执行符合触发条件的指令
     def exec_func(self, cmd_list, exit_cond=None):
         afterExecFunc = False
-        if exit_cond is not None:
+        exit_loop_flag = False
+        if exit_cond:
             if "afterExecFunc" in exit_cond:
                 exit_cond = exit_cond.split("@")[1]
                 afterExecFunc = True
         while True:
+            if self.stop:
+                return
             self.utils.get_img()
             if self.stop:
-                self.stop = False
-                break
+                return
             for cmd in cmd_list:
-                exec(self.func[cmd])
-                if self.exec_status:
+                if self.stop:
+                    return
+                if self.utils.match(self.func_to_img[cmd][0]):
+                    if len(self.func_to_img[cmd]) == 1:
+                        self.utils.tap()
+                    elif self.func_to_img[cmd][1] == "have_func":
+                        cmd_func = "self." + cmd + "()"
+                        exec(cmd_func)
+                    else:
+                        self.utils.write_log("【可能出错了】这不正常，匹配到了图片，但是没有执行任何操作")
                     # 如果达成退出条件，就会在执行完毕之后退出exec_func函数
-                    if afterExecFunc:
-                        if exit_cond == cmd:
-                            self.stop = True
-                    cmd_func = "self." + cmd + "()"
-                    exec(cmd_func)
-                    break
-            if self.stop:
-                self.stop = False
+                    if afterExecFunc and exit_cond == cmd:
+                        exit_loop_flag = True
+                        break
+            if exit_loop_flag:
                 break
+            if self.stop:
+                return
             # 防止截图太快重复点击
-            time.sleep(2)
+            time.sleep(self.exec_func_delay)
 
     # 故事模式（只重试，过关之后不挑战下一关）
     def story_mode_retry_only(self):
-        cmd_list = [
+        self.exec_func([
             "click_battle_retry",
             "click_battle"
-        ]
-        self.exec_func(cmd_list)
+        ])
+        self.utils.logger.finish_exec()
 
     # 故事模式（推图）
     def story_mode(self):
-        cmd_list = [
+        self.exec_func([
             "click_battle_retry",
             "click_next_stage",
             "click_battle",
@@ -371,44 +376,50 @@ class Command():
             "click_challenge_boss_fp",
             "check_bundle_pop_up",
             "check_level_up"
-        ]
-        self.exec_func(cmd_list)
+        ])
+        self.utils.logger.finish_exec()
 
     # 王座之塔模式（只重试，过关之后不挑战下一关）
     def tower_mode_retry_only(self):
-        cmd_list = [
+        self.exec_func([
             "click_battle_retry",
             "click_challenge",
             "click_battle"
-        ]
-        self.exec_func(cmd_list)
+        ])
+        self.utils.logger.finish_exec()
 
     # 王座之塔模式（推塔）
     def tower_mode(self):
-        cmd_list = [
+        self.exec_func([
             "click_battle_retry",
             "click_continue",
             "click_battle",
             "click_challenge"
-        ]
-        self.exec_func(cmd_list)
+        ])
+        self.utils.logger.finish_exec()
 
     # 日常任务模式
     def daily_mode(self):
-        self.is_daily_mode = True
         # 初始化“领地”、“野外”、“战役”的坐标
-        if self.ranhorn_coord is None or self.dark_forest_coord is None or self.campaign_coord is None:
+        if self.ranhorn_coord is None:
             self.utils.get_img()
-            if not self.utils.match("ranhorn_icon.png"):
-                self.utils.match("ranhorn_icon_chosen.png")
-            self.ranhorn_coord = self.utils.get_coord()
-            if not self.utils.match("dark_forest_icon.png"):
-                self.utils.match("dark_forest_icon_chosen.png")
-            self.dark_forest_coord = self.utils.get_coord()
-            if not self.utils.match("campaign_icon.png"):
-                self.utils.match("campaign_icon_chosen.png")
-            self.campaign_coord = self.utils.get_coord()
-        
+            try:
+                if not self.utils.match("ranhorn_icon.png"):
+                    self.utils.match("ranhorn_icon_chosen.png")
+                self.ranhorn_coord = self.utils.get_coord()
+                if not self.utils.match("dark_forest_icon.png"):
+                    self.utils.match("dark_forest_icon_chosen.png")
+                self.dark_forest_coord = self.utils.get_coord()
+                if not self.utils.match("campaign_icon.png"):
+                    self.utils.match("campaign_icon_chosen.png")
+                self.campaign_coord = self.utils.get_coord()
+            except:
+                self.utils.write_log("初始化“领地”、“野外”、“战役”的坐标失败，请检查游戏是否在首页")
+                self.utils.error_stop()
+
+        if self.stop:
+            return
+
         # 获取日常任务勾选信息
         mission_list = []
         if self.utils.ui.checkBox_2.isChecked():
@@ -442,18 +453,18 @@ class Command():
         
         # 按照mission list执行每日任务
         for mission in mission_list:
+            if self.stop:
+                return
             func = "self." + mission + "()"
             exec(func)
-            if self.kill_daily_mode:
-                break
+
+            if self.stop:
+                return
+            
             time.sleep(2)
 
-        if self.kill_daily_mode:
-            self.kill_daily_mode = False
-            self.utils.write_log("【日常任务】中断执行！")
-        else:
-            self.utils.write_log("【日常任务】全部完成！")
-        self.utils.error_stop()
+        self.utils.write_log("【日常任务】全部完成！")
+        self.utils.logger.finish_exec()
     
     # 日常任务 - 挑战首领1次（20pts）
     def daily_challenge_boss(self):
@@ -578,7 +589,8 @@ class Command():
                 # 给予设备足够的反应时间后，点击空白处关闭结算界面
                 time.sleep(2)
                 while self.utils.current_match('guild_boss_fight_victory.png'):
-                    self.utils.tap(0.5, 0.9, percentage=True)
+                    self.utils.tap(0.2, 0.9, percentage=True, randomize=False)
+                    self.utils.tap(0.2, 0.9, percentage=True, randomize=False)
                 time.sleep(2)
                 self.mission_accomplished = True
                 self.mission_accomplished_cnt += 1
@@ -626,7 +638,7 @@ class Command():
         ]
         self.exec_func(cmd_list, exit_cond="afterExecFunc@click_arena_challenge_button")
         mission_complete = False
-        time.sleep(1)
+        time.sleep(2)
         # 免费票打完为止
         while self.utils.current_match('arena_free_battle_button.png'):
             # 寻找y值最大的坐标（最下方的挑战）
@@ -749,7 +761,6 @@ class Command():
         self.utils.show_cnt()
         self.utils.tap()
         
-
     # 点击“下一关”
     def click_next_stage(self):
         # 挑战成功，重置”重试计数“
@@ -757,31 +768,11 @@ class Command():
         self.utils.write_log("【故事模式】恭喜过关！即将自动开始挑战下一关！")
         self.utils.tap()
 
-
     # 点击“点击屏幕继续”（用于王座之塔页面）
     def click_continue(self):
         # 挑战成功，重置“重试计数”
         self.utils.cnt = 0
         self.utils.write_log("【王座之塔】恭喜过关！即将自动开始挑战下一关！")
-        self.utils.tap()
-
-
-    # 点击“战斗”
-    def click_battle(self):
-        self.utils.tap()
-
-
-    # 点击“挑战”（用于王座之塔页面）
-    def click_challenge(self):
-        self.utils.tap()
-
-    # 检测是否为推图boss关卡
-    # 推图到boss关卡时，点击“下一关”无效，会退回到关卡详情页面，需要点击“挑战首领”一次才能进入搭配阵容界面
-    def check_boss_stage(self):
-        self.utils.tap()
-
-    # 点击主页面（战役tab）的“挑战首领”
-    def click_challenge_boss_fp(self):
         self.utils.tap()
 
     # 检测限时礼包弹窗
@@ -796,95 +787,6 @@ class Command():
         self.utils.tap(0.5, 0.9, percentage=True)
         self.utils.write_log("检测到升级弹窗并自动关闭成功！")
 
-    # 点击战斗界面的暂停
-    def click_battle_pause(self):
-        self.utils.tap()
-    
-    # 点击战斗时暂停界面的“退出战斗”
-    def click_battle_exit(self):
-        self.utils.tap()
-
-    # 点击“战役”界面的挂机箱子
-    def click_idle_chest(self):
-        self.utils.tap()
-
-    # 点击右侧好友图标
-    def click_friend_button(self):
-        self.utils.tap()
-
     # 点击右侧展开按钮
     def click_expand_left_col_button(self):
         self.utils.tap(randomize=False)
-
-    # 点击好友界面的“一键领取和赠送”
-    def click_send_heart_button(self):
-        self.utils.tap()
-
-    # 点击好友界面的“返回”
-    def click_close_friend_ui_button(self):
-        self.utils.tap()
-
-    # 点击“快速挂机”
-    def click_instant_idle_button(self):
-        self.utils.tap()
-    
-    # 点击快速挂机界面的“取消”
-    def click_instant_idle_close_button(self):
-        self.utils.tap()
-
-    # 点击进入“月桂酒馆”
-    def click_noble_tavern_button(self):
-        self.utils.tap()
-
-    # 选中“月桂酒馆”的友情池
-    def click_friend_summon_pool(self):
-        self.utils.tap()
-    
-    # 点击进入“公会”
-    def click_guild_button(self):
-        self.utils.tap()
-
-    # 点击进入“公会”的“公会狩猎”
-    def click_guild_boss_button(self):
-        self.utils.tap()
-    
-    # 点击进入“竞技场”
-    def click_arena_button(self):
-        self.utils.tap()
-
-    # 点击进入“普通竞技场”
-    def click_normal_arena_button(self):
-        self.utils.tap()
-
-    # “普通竞技场”中点击“挑战”
-    def click_arena_challenge_button(self):
-        self.utils.tap()
-
-    # 战斗中点击“跳过战斗”图标
-    def click_skip_battle_button(self):
-        self.utils.tap()
-
-    # 点击“悬赏栏”
-    def click_bounty_board_button(self):
-        self.utils.tap()
-
-    # “悬赏栏”点击“一键派遣”
-    def click_bounty_board_dispatch_all_button(self):
-        self.utils.tap()
-
-    # “悬赏栏”的“一键派遣”点击“确认”
-    def click_bounty_board_confirm_button(self):
-        self.utils.tap()
-
-    # “悬赏栏”点击“一键领取”
-    def click_bounty_board_collect_all_button(self):
-        self.utils.tap()
-    
-    # 点击“王座之塔”
-    def click_tower_button(self):
-        self.utils.tap()
-
-    # 点击“王座之塔”的主塔
-    def click_tower_main_button(self):
-        self.utils.tap()
-    

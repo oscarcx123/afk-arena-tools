@@ -7,11 +7,11 @@
     <x>0</x>
     <y>0</y>
     <width>801</width>
-    <height>605</height>
+    <height>555</height>
    </rect>
   </property>
   <property name="windowTitle">
-   <string>afk-arena-tools V1.1.0</string>
+   <string>afk-arena-tools V1.1.1 by oscarcx123</string>
   </property>
   <widget class="QWidget" name="centralwidget">
    <widget class="QTabWidget" name="tabWidget">
@@ -351,7 +351,7 @@
         </rect>
        </property>
        <property name="text">
-        <string>Placeholder</string>
+        <string>当前执行状态</string>
        </property>
       </widget>
      </widget>
@@ -385,7 +385,7 @@
       <widget class="QRadioButton" name="radioButton">
        <property name="geometry">
         <rect>
-         <x>10</x>
+         <x>20</x>
          <y>30</y>
          <width>221</width>
          <height>19</height>
@@ -398,7 +398,7 @@
       <widget class="QRadioButton" name="radioButton_2">
        <property name="geometry">
         <rect>
-         <x>10</x>
+         <x>20</x>
          <y>60</y>
          <width>221</width>
          <height>19</height>
@@ -411,7 +411,7 @@
       <widget class="QRadioButton" name="radioButton_3">
        <property name="geometry">
         <rect>
-         <x>10</x>
+         <x>20</x>
          <y>90</y>
          <width>221</width>
          <height>19</height>
@@ -765,60 +765,70 @@
        </rect>
       </property>
       <property name="title">
-       <string>不推荐使用（Deprecated）</string>
+       <string>脚本执行设置</string>
       </property>
-      <widget class="QCheckBox" name="checkBox">
-       <property name="geometry">
-        <rect>
-         <x>10</x>
-         <y>30</y>
-         <width>221</width>
-         <height>19</height>
-        </rect>
-       </property>
-       <property name="text">
-        <string>使用720/1080的比例</string>
-       </property>
-      </widget>
       <widget class="QLabel" name="label_2">
        <property name="geometry">
         <rect>
-         <x>10</x>
-         <y>50</y>
-         <width>231</width>
-         <height>51</height>
+         <x>20</x>
+         <y>30</y>
+         <width>131</width>
+         <height>21</height>
         </rect>
        </property>
        <property name="text">
-        <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;用于解决手机显示/触控分辨率不同，如果以后重构，会移除此项&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+        <string>截图延迟（秒）</string>
        </property>
-       <property name="wordWrap">
-        <bool>true</bool>
+      </widget>
+      <widget class="QLabel" name="label_10">
+       <property name="geometry">
+        <rect>
+         <x>20</x>
+         <y>60</y>
+         <width>131</width>
+         <height>21</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>匹配阈值（0-1）</string>
+       </property>
+      </widget>
+      <widget class="QDoubleSpinBox" name="doubleSpinBox">
+       <property name="geometry">
+        <rect>
+         <x>170</x>
+         <y>30</y>
+         <width>70</width>
+         <height>21</height>
+        </rect>
+       </property>
+       <property name="maximum">
+        <double>5.000000000000000</double>
+       </property>
+       <property name="singleStep">
+        <double>0.100000000000000</double>
+       </property>
+      </widget>
+      <widget class="QDoubleSpinBox" name="doubleSpinBox_2">
+       <property name="geometry">
+        <rect>
+         <x>170</x>
+         <y>60</y>
+         <width>70</width>
+         <height>21</height>
+        </rect>
+       </property>
+       <property name="maximum">
+        <double>1.000000000000000</double>
+       </property>
+       <property name="singleStep">
+        <double>0.010000000000000</double>
        </property>
       </widget>
      </widget>
     </widget>
    </widget>
   </widget>
-  <widget class="QMenuBar" name="menubar">
-   <property name="geometry">
-    <rect>
-     <x>0</x>
-     <y>0</y>
-     <width>801</width>
-     <height>26</height>
-    </rect>
-   </property>
-   <widget class="QMenu" name="menu">
-    <property name="title">
-     <string>帮助</string>
-    </property>
-    <addaction name="action"/>
-    <addaction name="action_2"/>
-   </widget>
-   <addaction name="menu"/>
-  </widget>
-  <widget class="QStatusBar" name="statusbar"/>
   <action name="action">
    <property name="text">
     <string>afk-arena-tools 帮助</string>
