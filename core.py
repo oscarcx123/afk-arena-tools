@@ -52,8 +52,6 @@ class Utils():
         self.wifi_adb_addr = "192.168.1.239:5555"
         # log转发
         self.logger = UpdateLog()
-        # 加载图像资源
-        self.load_res()
 
     # 加载图像资源
     def load_res(self):
@@ -75,7 +73,7 @@ class Utils():
 
 
     # 获取截图
-    def get_img(self, pop_up_window=False, save_img=False):
+    def get_img(self, pop_up_window=False, save_img=False, file_name='screenshot.png'):
         image_bytes = self.exec_cmd("adb exec-out screencap -p")
 
         if image_bytes == b'':
@@ -84,7 +82,7 @@ class Utils():
         else:
             self.target_img = cv2.imdecode(np.fromstring(image_bytes, dtype='uint8'), cv2.IMREAD_COLOR)
             if save_img:
-                cv2.imwrite('screenshot.png', self.target_img)
+                cv2.imwrite(file_name, self.target_img)
             if pop_up_window:
                 self.show_img()
 
@@ -271,6 +269,24 @@ class Utils():
                 self.stop_callback = False
                 break
 
+    def auto_screenshot_on_win(self, mode):
+        def check_dir(mode):
+            if not os.path.isdir("homework"):
+                os.mkdir("homework")
+            if not os.path.isdir(os.path.join("homework", mode)):
+                os.mkdir(os.path.join("homework", mode))
+        if self.ui.checkBox_14.isChecked():
+            if self.match("stat_button.png"):
+                self.tap()
+                name = time.strftime("%Y-%m-%d_%H%M%S", time.localtime()) + ".png"
+                relative_path = os.path.join("homework", mode, name)
+                check_dir(mode)
+                # sleep3秒，确保能截到图，否则游戏内战斗数据有可能还没加载完全
+                time.sleep(3)
+                self.get_img(save_img=True, file_name=relative_path)
+                self.current_match("close_stat_button.png")
+                self.tap()
+                self.write_log(f"截图成功，存放在{relative_path}")
 
 # 预设的一些指令组
 class Command():
@@ -281,6 +297,8 @@ class Command():
             "click_battle_retry": ["after_battle_retry_button.png", "have_func"], 
             "click_next_stage": ["next_stage_button.png", "have_func"], 
             "click_continue": ["continue_button.png", "have_func"], 
+            "no_click_next_stage": ["next_stage_button.png", "have_func"], 
+            "no_click_continue": ["continue_button.png", "have_func"], 
             "click_battle": ["battle_button.png"], 
             "click_battle_pause": ["in_battle_pause_button.png"], 
             "click_battle_exit": ["in_battle_exit_button.png"], 
@@ -358,16 +376,19 @@ class Command():
             # 防止截图太快重复点击
             time.sleep(self.exec_func_delay)
 
-    # 故事模式（只重试，过关之后不挑战下一关）
+    # 主线模式（只重试，过关之后不挑战下一关）
     def story_mode_retry_only(self):
+        self.utils.write_log("开始执行【主线模式（只重试）】！")
         self.exec_func([
             "click_battle_retry",
+            "no_click_next_stage",
             "click_battle"
-        ])
+        ], exit_cond="afterExecFunc@no_click_next_stage")
         self.utils.logger.finish_exec()
 
-    # 故事模式（推图）
+    # 主线模式（推图）
     def story_mode(self):
+        self.utils.write_log("开始执行【主线模式（推图）】！")
         self.exec_func([
             "click_battle_retry",
             "click_next_stage",
@@ -381,15 +402,18 @@ class Command():
 
     # 王座之塔模式（只重试，过关之后不挑战下一关）
     def tower_mode_retry_only(self):
+        self.utils.write_log("开始执行【王座之塔模式（只重试）】！")
         self.exec_func([
             "click_battle_retry",
+            "no_click_continue",
             "click_challenge",
             "click_battle"
-        ])
+        ], exit_cond="afterExecFunc@no_click_continue")
         self.utils.logger.finish_exec()
 
     # 王座之塔模式（推塔）
     def tower_mode(self):
+        self.utils.write_log("开始执行【王座之塔模式（推塔）】！")
         self.exec_func([
             "click_battle_retry",
             "click_continue",
@@ -400,6 +424,7 @@ class Command():
 
     # 日常任务模式
     def daily_mode(self):
+        self.utils.write_log("开始执行【日常任务模式】！")
         # 初始化“领地”、“野外”、“战役”的坐标
         if self.ranhorn_coord is None:
             self.utils.get_img()
@@ -763,17 +788,35 @@ class Command():
         
     # 点击“下一关”
     def click_next_stage(self):
-        # 挑战成功，重置”重试计数“
+        # 挑战成功，重置“重试计数”
         self.utils.cnt = 0
-        self.utils.write_log("【故事模式】恭喜过关！即将自动开始挑战下一关！")
+        self.utils.write_log("【主线模式】恭喜过关！即将自动开始挑战下一关！")
+        self.utils.auto_screenshot_on_win(mode="main")
+        self.utils.current_match("next_stage_button.png")
         self.utils.tap()
+
+    # 只检测，不点击“下一关”
+    def no_click_next_stage(self):
+        # 挑战成功，重置“重试计数”
+        self.utils.cnt = 0
+        self.utils.write_log("【主线模式】恭喜过关！")
+        self.utils.auto_screenshot_on_win(mode="main")
 
     # 点击“点击屏幕继续”（用于王座之塔页面）
     def click_continue(self):
         # 挑战成功，重置“重试计数”
         self.utils.cnt = 0
         self.utils.write_log("【王座之塔】恭喜过关！即将自动开始挑战下一关！")
+        self.utils.auto_screenshot_on_win(mode="tower")
+        self.utils.current_match("continue_button.png")
         self.utils.tap()
+
+    # 只检测，不点击“点击屏幕继续”（用于王座之塔页面）
+    def no_click_continue(self):
+        # 挑战成功，重置“重试计数”
+        self.utils.cnt = 0
+        self.utils.write_log("【王座之塔】恭喜过关！")
+        self.utils.auto_screenshot_on_win(mode="tower")
 
     # 检测限时礼包弹窗
     # 如果过关之后弹出限时礼包购买窗口，直接点击屏幕下方关闭

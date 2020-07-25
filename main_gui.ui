@@ -11,7 +11,7 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>afk-arena-tools V1.1.1 by oscarcx123</string>
+   <string>afk-arena-tools V1.1.2 by oscarcx123</string>
   </property>
   <widget class="QWidget" name="centralwidget">
    <widget class="QTabWidget" name="tabWidget">
@@ -434,25 +434,17 @@
       <property name="title">
        <string>配置文件设置</string>
       </property>
-      <widget class="QLabel" name="label">
+      <widget class="QCheckBox" name="checkBox_14">
        <property name="geometry">
         <rect>
-         <x>50</x>
-         <y>60</y>
-         <width>371</width>
-         <height>121</height>
+         <x>20</x>
+         <y>30</y>
+         <width>201</width>
+         <height>19</height>
         </rect>
        </property>
-       <property name="font">
-        <font>
-         <pointsize>30</pointsize>
-        </font>
-       </property>
        <property name="text">
-        <string>啥也没有</string>
-       </property>
-       <property name="alignment">
-        <set>Qt::AlignCenter</set>
+        <string>过关自动截图</string>
        </property>
       </widget>
      </widget>

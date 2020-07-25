@@ -1,8 +1,19 @@
 import os
+import json
+import time
 import zipfile
 
 # 版本号
-version_str = "V1.1.1"
+ver = "1.1.2"
+version_str = "V" + ver
+
+# 生成version.json
+version_data = {}
+version_data["version"] = ver
+version_data["url"] = "https://github.com/oscarcx123/afk-arena-tools/releases"
+version_data["time"] = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
+with open(os.path.join(os.getcwd(), "version.json"), "w") as f:
+    json.dump(version_data, f)
 
 # 核心文件清单，这些文件进入所有平台的包
 core_file_list = [
@@ -11,7 +22,8 @@ core_file_list = [
     'LICENSE',
     'main.py',
     'main_gui.py',
-    'README.md'
+    'README.md',
+    'version.json'
 ]
 
 # Windows相关文件
@@ -46,7 +58,7 @@ destination_dir = os.path.join(os.getcwd(), "dist")
 file_name = "afk-arena-tools_" + version_str + "_windows.zip"
 zip_dir = os.path.join(destination_dir, file_name)
 
-with zipfile.ZipFile(zip_dir, "w") as zfile:
+with zipfile.ZipFile(zip_dir, "w", zipfile.ZIP_DEFLATED) as zfile:
     for f in core_file_list:
         zfile.write(f)
     for f in img_list:
@@ -58,7 +70,7 @@ with zipfile.ZipFile(zip_dir, "w") as zfile:
 file_name = "afk-arena-tools_" + version_str + "_linux.zip"
 zip_dir = os.path.join(destination_dir, file_name)
 
-with zipfile.ZipFile(zip_dir, "w") as zfile:
+with zipfile.ZipFile(zip_dir, "w", zipfile.ZIP_DEFLATED) as zfile:
     for f in core_file_list:   
         zfile.write(f)
     for f in img_list:

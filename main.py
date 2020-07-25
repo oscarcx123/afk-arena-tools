@@ -2,6 +2,7 @@ import os
 import sys
 import time
 import json
+import requests
 from functools import partial
 from threading import Thread
 from PyQt5.QtWidgets import QApplication, QMainWindow
@@ -27,16 +28,21 @@ class MainWin(QMainWindow):
         self.afk = Command()
         # 让功能模块（core.py）也能访问UI
         self.afk.utils.ui = self.ui
-        # 图形界面数值的初始化
+        # GUI数值初始化
         self.init_interface()
         # 信号初始化
         self.init_signal()
-        self.write_log("初始化完成！")
-        self.write_log("afk-arena-tools是开源软件，如果有任何问题建议想法，欢迎提issue或PR~")
-        # pyqt必要的代码
+        # 显示GUI
         self.show()
+        self.write_log("程序核心初始化完成！")
+        # 加载图片资源
+        self.afk.utils.load_res()
+        self.write_log("图片资源加载完成！")
+        self.write_log("afk-arena-tools是开源软件，如果有任何问题建议想法，欢迎提issue或PR~")
+        # 检查更新
+        Thread(target=self.check_update).start()
         sys.exit(self.app.exec_())
-
+        
 
     # 图形界面数值的初始化
     def init_interface(self):
@@ -94,6 +100,7 @@ class MainWin(QMainWindow):
         self.ui.checkBox_11.setCheckable(False)
         self.ui.checkBox_12.setCheckable(False)
         self.ui.checkBox_13.setCheckable(False)
+        self.ui.checkBox_14.setChecked(True)
         # 脚本执行设置
         self.ui.doubleSpinBox.setValue(1.00)
         self.ui.doubleSpinBox_2.setValue(0.90)
@@ -117,6 +124,7 @@ class MainWin(QMainWindow):
         conf_data["checkBox_11"] = self.ui.checkBox_11.isCheckable()
         conf_data["checkBox_12"] = self.ui.checkBox_12.isCheckable()
         conf_data["checkBox_13"] = self.ui.checkBox_13.isCheckable()
+        conf_data["checkBox_14"] = self.ui.checkBox_14.isChecked()
         conf_data["doubleSpinBox"] = self.afk.exec_func_delay
         conf_data["doubleSpinBox_2"] = self.afk.utils.threshold
         with open(os.path.join(os.getcwd(), "conf.json"), "w") as f:
@@ -153,6 +161,7 @@ class MainWin(QMainWindow):
                 self.ui.checkBox_11.setCheckable(conf_data["checkBox_11"])
                 self.ui.checkBox_12.setCheckable(conf_data["checkBox_12"])
                 self.ui.checkBox_13.setCheckable(conf_data["checkBox_13"])
+                self.ui.checkBox_14.setChecked(conf_data["checkBox_14"])
                 self.afk.exec_func_delay = float(conf_data["doubleSpinBox"])
                 self.ui.doubleSpinBox.setValue(self.afk.exec_func_delay)
                 self.afk.utils.threshold = float(conf_data["doubleSpinBox_2"])
@@ -166,6 +175,37 @@ class MainWin(QMainWindow):
             self.load_default_conf()
             self.save_conf()
   
+    # 检查更新
+    def check_update(self):
+        def compare_ver(web_ver, local_ver):
+            if web_ver == local_ver:
+                return 0
+            web_ver = web_ver.split(".")
+            local_ver = local_ver.split(".")
+            for i in range(len(web_ver)):
+                if int(web_ver[i]) > int(local_ver[i]):
+                    return 1
+                if int(web_ver[i]) < int(local_ver[i]):
+                    return 0
+
+        try:
+            # 获取最新版本信息
+            r = requests.get("https://raw.githubusercontent.com/oscarcx123/afk-arena-tools/master/version.json")
+            web_ver_info = r.json()
+            # 读取本地版本信息
+            with open(os.path.join(os.getcwd(), "version.json")) as f:
+                local_ver_info = json.load(f)
+            # 比较版本号
+            if compare_ver(web_ver_info["version"], local_ver_info["version"]):
+                self.afk.utils.write_log
+                self.afk.utils.write_log(f"检测到新版本！")
+                self.afk.utils.write_log(f"版本号：{web_ver_info['version']}")
+                self.afk.utils.write_log(f"更新日期：{web_ver_info['time']}")
+                self.afk.utils.write_log(f"下载地址：{web_ver_info['url']}")
+            else:
+                self.afk.utils.write_log(f"当前已经是最新版本！")
+        except:
+            self.afk.utils.write_log(f"获取版本信息失败！")
 
     # 执行功能
     def do_func(self, func):
@@ -188,6 +228,7 @@ class MainWin(QMainWindow):
     # 线程正常执行完毕
     def thread_finish_exec(self):
         self.curr_func = None
+        self.write_log("功能执行完毕！")
     
     # 在GUI窗口的log框中输出日志
     def write_log(self, text=None):
