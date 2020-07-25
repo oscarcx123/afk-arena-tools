@@ -55,4 +55,4 @@ sudo apt-get install python3-pyqt5 python3-opencv
 
 然后就大功告成啦~
 
-![](./_docs/img/Raspbian_10 _buster_armv7l_success.png)
+![](./img/Raspbian_10 _buster_armv7l_success.png)
