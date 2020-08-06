@@ -197,7 +197,6 @@ class MainWin(QMainWindow):
                 local_ver_info = json.load(f)
             # 比较版本号
             if compare_ver(web_ver_info["version"], local_ver_info["version"]):
-                self.afk.utils.write_log
                 self.afk.utils.write_log(f"检测到新版本！")
                 self.afk.utils.write_log(f"版本号：{web_ver_info['version']}")
                 self.afk.utils.write_log(f"更新日期：{web_ver_info['time']}")
