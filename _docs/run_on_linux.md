@@ -56,3 +56,36 @@ sudo apt-get install python3-pyqt5 python3-opencv
 然后就大功告成啦~
 
 ![](./img/Raspbian_10_buster_armv7l_success.png)
+
+# Manjaro (5.6.19-2-MANJARO)
+
+系统自带adb和PyQt5，所以只需要安装opencv
+
+正常情况下执行下面命令就行
+
+```
+sudo pip install python-opencv
+```
+
+但是这么装完之后，运行程序会报错（如下所示），貌似是最新版python-opencv（4.4.0.40）在Linux上有点毛病
+
+```
+$ python main.py 
+QObject::moveToThread: Current thread (0x5641812107e0) is not the object's thread (0x564181826a60).
+Cannot move to target thread (0x5641812107e0)
+
+qt.qpa.plugin: Could not load the Qt platform plugin "xcb" in "/usr/lib/python3.8/site-packages/cv2/qt/plugins" even though it was found.
+This application failed to start because no Qt platform plugin could be initialized. Reinstalling the application may fix this problem.
+
+Available platform plugins are: xcb, eglfs, linuxfb, minimal, minimalegl, offscreen, vnc.
+
+Aborted (core dumped)
+```
+
+所以这里选择回退到去年的最后一个版本`4.1.2.30`，回退之前先`pip uninstall`卸载最新版，或者直接用`-I`强行覆盖
+
+```
+sudo pip install opencv-python==4.1.2.30
+```
+
+然后就搞定了，截图我就不放了

@@ -28,16 +28,18 @@
 目前以下操作系统测试通过：
 * Windows 10 (ver 1903)
 * Raspbian 10 (buster) armv7l
+* Manjaro (5.6.19-2-MANJARO)
 
 电脑需要安装：
 * Python3.6或以上版本
 * adb（Windows版本的release包自带）
-* OpenCV（从pip安装即可）
-* PyQt5（从pip安装即可）
+* OpenCV（从pip安装）
+* PyQt5（从pip安装）
+* requests（从pip安装）
 
 Windows输入下面指令即可安装
 ```
-pip install opencv-python PyQt5
+pip install requests opencv-python PyQt5
 ```
 
 Linux看[这里](./_docs/run_on_linux.md)
