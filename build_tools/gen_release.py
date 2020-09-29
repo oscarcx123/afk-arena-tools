@@ -4,14 +4,14 @@ import time
 import zipfile
 
 # 版本号
-ver = "1.1.2"
+ver = "1.1.3"
 version_str = "V" + ver
 
 # 生成version.json
 version_data = {}
 version_data["version"] = ver
-version_data["url"] = "https://github.com/oscarcx123/afk-arena-tools/releases"
-version_data["time"] = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
+version_data["url"] = "https://github.com/oscarcx123/afk-arena-tools/releases/latest"
+version_data["time"] = time.strftime("%Y-%m-%d", time.localtime())
 with open(os.path.join(os.getcwd(), "version.json"), "w") as f:
     json.dump(version_data, f)
 

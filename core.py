@@ -108,7 +108,7 @@ class Utils():
         except:
             self.write_log(f"OpenCV对比失败！请使用杂项中的截图功能来测试能否正常截图！")
             self.error_stop()
-        # print(f"{img_name}最大匹配度：{max_val}")
+        print(f"{img_name}最大匹配度：{max_val}")
         if max_val < self.threshold:
             return False
         
@@ -297,11 +297,13 @@ class Command():
             "click_battle_retry": ["after_battle_retry_button.png", "have_func"], 
             "click_next_stage": ["next_stage_button.png", "have_func"], 
             "click_continue": ["continue_button.png", "have_func"], 
+            "click_continue_campaign": ["continue_button.png"], 
             "no_click_next_stage": ["next_stage_button.png", "have_func"], 
             "no_click_continue": ["continue_button.png", "have_func"], 
             "click_battle": ["battle_button.png"], 
             "click_battle_pause": ["in_battle_pause_button.png"], 
             "click_battle_exit": ["in_battle_exit_button.png"], 
+            "click_next_team": ["next_team_button.png"],
             "click_challenge": ["challenge_button.png"], 
             "check_boss_stage": ["challenge_boss_button.png"], 
             "check_bundle_pop_up": ["bundle_pop_up.png", "have_func"], 
@@ -382,6 +384,7 @@ class Command():
         self.exec_func([
             "click_battle_retry",
             "no_click_next_stage",
+            "click_next_team",
             "click_battle"
         ], exit_cond="afterExecFunc@no_click_next_stage")
         self.utils.logger.finish_exec()
@@ -392,6 +395,8 @@ class Command():
         self.exec_func([
             "click_battle_retry",
             "click_next_stage",
+            "click_continue_campaign",
+            "click_next_team",
             "click_battle",
             "check_boss_stage",
             "click_challenge_boss_fp",
